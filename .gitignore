@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local configuration files with sensitive data (API keys, etc.)
+local.properties
+*.keystore
+.env
+.env.local
+.env.*.local
