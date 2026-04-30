@@ -17,7 +17,7 @@ class _ButtonCustomWidgetState extends State<ButtonCustomWidget> {
       height: 64,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 0, 92, 48),
+        color: const Color.fromARGB(255, 77, 191, 134),
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
