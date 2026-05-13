@@ -1,11 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'widgets/header.dart';
 import 'widgets/map_panel.dart';
+import 'widgets/map_fullscreen_selector.dart';
 import 'widgets/stats_actions.dart';
 import 'widgets/export_section.dart';
+
+import 'package:farmlens_app/data/models/analysis/segmentation_model.dart';
+import 'package:farmlens_app/data/services/analysis/segmentation_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,15 +25,20 @@ class _HomeScreenState extends State<HomeScreen> {
       Completer<GoogleMapController>();
 
   MapType _currentMapType = MapType.normal;
-  DateTime _selectedDate = DateTime.now();
+  DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
+  DateTime _endDate = DateTime.now();
   String _selectedRegion = 'Selected area: Central farm block';
+  LatLng? _selectedLatLng;
   double _calculatedArea = 125.5;
   double _changePercent = 12.4;
   double _modelConfidence = 91.0;
   double _cloudCoverage = 18.0;
   Set<Polygon> _cropMasks = {};
+  Set<Marker> _selectionMarkers = {};
+  Uint8List? _segmentationImageBytes;
+  String? _segmentationImageError;
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
+  CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(16.0544, 108.2022),
     zoom: 12,
   );
@@ -38,107 +49,59 @@ class _HomeScreenState extends State<HomeScreen> {
     ).showSnackBar(SnackBar(content: Text('Selected $action')));
   }
 
-  void _selectRegion() {
-    // keep simple: call map panel's selection UI
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  Future<void> _selectRegion() async {
+    final LatLng? selection = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MapFullscreenSelector(
+          initialCamera: _kGooglePlex,
+          initialSelected: _selectedLatLng,
+        ),
       ),
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Choose analysis area',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 12),
-                ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xFFE8F5E9),
-                    child: Icon(
-                      Icons.edit_location_alt,
-                      color: Color(0xFF2E7D32),
-                    ),
-                  ),
-                  title: const Text('Draw on map'),
-                  subtitle: const Text('Trace a polygon for the target field'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(
-                      () => _selectedRegion =
-                          'Selected area: Polygon drawn on map',
-                    );
-                    ScaffoldMessenger.of(this.context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Polygon drawing mode opened'),
-                      ),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xFFE8F5E9),
-                    child: Icon(Icons.map_outlined, color: Color(0xFF2E7D32)),
-                  ),
-                  title: const Text('Pick from map'),
-                  subtitle: const Text('Tap a predefined region on the map'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(
-                      () => _selectedRegion = 'Selected area: Region from map',
-                    );
-                    ScaffoldMessenger.of(this.context).showSnackBar(
-                      const SnackBar(content: Text('Map region picker opened')),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xFFE8F5E9),
-                    child: Icon(
-                      Icons.bookmark_outline,
-                      color: Color(0xFF2E7D32),
-                    ),
-                  ),
-                  title: const Text('Saved regions'),
-                  subtitle: const Text('Reuse a previously analyzed area'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(
-                      () => _selectedRegion = 'Selected area: Saved region',
-                    );
-                    ScaffoldMessenger.of(this.context).showSnackBar(
-                      const SnackBar(content: Text('Saved regions opened')),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
+    if (selection == null) return;
+    setState(() {
+      _selectedLatLng = selection;
+      _kGooglePlex = CameraPosition(target: selection, zoom: 12);
+      _selectedRegion =
+          'Selected area: ${selection.latitude.toStringAsFixed(5)}, ${selection.longitude.toStringAsFixed(5)}';
+      _selectionMarkers = {
+        Marker(
+          markerId: const MarkerId('selected_region'),
+          position: selection,
+        ),
+      };
+    });
+    await _moveCamera(_kGooglePlex);
   }
 
   void _selectTime() async {
-    final date = await showDatePicker(
+    final range = await showDateRangePicker(
       context: context,
-      initialDate: _selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
+      initialDateRange: DateTimeRange(start: _startDate, end: _endDate),
     );
-    if (date != null) setState(() => _selectedDate = date);
+    if (range != null) {
+      setState(() {
+        _startDate = range.start;
+        _endDate = range.end;
+      });
+    }
   }
 
-  void _runAnalysis() {
+  Future<void> _runAnalysis() async {
+    if (_selectedLatLng == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a location on the map.')),
+      );
+      return;
+    }
+    final String startDate =
+        '${_startDate.year.toString().padLeft(4, '0')}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')}';
+    final String endDate =
+        '${_endDate.year.toString().padLeft(4, '0')}-${_endDate.month.toString().padLeft(2, '0')}-${_endDate.day.toString().padLeft(2, '0')}';
+    final double lat = _selectedLatLng!.latitude;
+    final double lng = _selectedLatLng!.longitude;
     // Generate simulated crop mask polygons
     final List<LatLng> cropBoundary = [
       const LatLng(16.050, 108.198),
@@ -168,6 +131,38 @@ class _HomeScreenState extends State<HomeScreen> {
         content: Text('Running satellite segmentation pipeline...'),
       ),
     );
+    try {
+      final service = SegmentationService();
+      final result = await service.fetchSegmentation(
+        lat,
+        lng,
+        startDate,
+        endDate,
+        5,
+      );
+      if (result['code'] == 200) {
+        final SegmentationModel data = result['data'];
+        setState(() {
+          _calculatedArea = data.pixel_area_m2 * 0.0001;
+          _changePercent = 10.5;
+          _modelConfidence = 95.2;
+          _cloudCoverage = data.cloud_cover;
+        });
+        _setSegmentationImage(data.segmentation_base64);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Segmentation analysis completed!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Analysis failed: ${result['message']}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error during analysis: $e')));
+      debugPrint('Error during analysis: $e');
+    }
   }
 
   void _exportReport(String format) => ScaffoldMessenger.of(
@@ -176,6 +171,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onMapCreated(GoogleMapController controller) =>
       _controller.complete(controller);
+
+  Future<void> _moveCamera(CameraPosition position) async {
+    if (!_controller.isCompleted) return;
+    final controller = await _controller.future;
+    await controller.animateCamera(CameraUpdate.newCameraPosition(position));
+  }
+
+  void _setSegmentationImage(String? base64Image) {
+    if (base64Image == null || base64Image.trim().isEmpty) {
+      setState(() {
+        _segmentationImageBytes = null;
+        _segmentationImageError = 'Segmentation image is empty.';
+      });
+      return;
+    }
+    try {
+      final String cleaned = base64Image.contains(',')
+          ? base64Image.split(',').last
+          : base64Image;
+      final Uint8List bytes = base64Decode(cleaned);
+      setState(() {
+        _segmentationImageBytes = bytes;
+        _segmentationImageError = null;
+      });
+    } catch (_) {
+      setState(() {
+        _segmentationImageBytes = null;
+        _segmentationImageError = 'Invalid segmentation image data.';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -316,8 +342,86 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     selectedRegionLabel: _selectedRegion,
                     cropMasks: _cropMasks,
+                    selectionMarkers: _selectionMarkers,
                   ),
                   const SizedBox(height: 18),
+
+                  if (_segmentationImageBytes != null ||
+                      _segmentationImageError != null) ...[
+                    _sectionTitle('Segmentation preview'),
+                    const SizedBox(height: 10),
+                    Column(
+                      children: [
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 12,
+                          runSpacing: 8,
+                          children: [
+                            _legendItem(
+                              color: const Color.fromARGB(255, 255, 255, 0),
+                              label: 'agriculture',
+                            ),
+                            _legendItem(
+                              color: const Color.fromARGB(255, 232, 184, 153),
+                              label: 'barren',
+                            ),
+                            _legendItem(
+                              color: const Color.fromARGB(255, 0, 255, 0),
+                              label: 'forest',
+                            ),
+                            _legendItem(
+                              color: const Color.fromARGB(255, 255, 0, 255),
+                              label: 'rangeland',
+                            ),
+                            _legendItem(
+                              color: const Color.fromARGB(255, 0, 0, 0),
+                              label: 'unknown',
+                            ),
+                            _legendItem(
+                              color: const Color.fromARGB(255, 0, 255, 255),
+                              label: 'urban',
+                            ),
+                            _legendItem(
+                              color: const Color.fromARGB(255, 0, 0, 255),
+                              label: 'water',
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x1A000000),
+                                blurRadius: 16,
+                                offset: Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: _segmentationImageBytes == null
+                              ? Text(
+                                  _segmentationImageError ??
+                                      'No segmentation preview available.',
+                                  style: const TextStyle(
+                                    color: Colors.redAccent,
+                                  ),
+                                )
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.memory(
+                                    _segmentationImageBytes!,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                  ],
 
                   // Quick actions + stats
                   StatsActions(
@@ -352,6 +456,27 @@ class _HomeScreenState extends State<HomeScreen> {
         fontWeight: FontWeight.w800,
         color: Colors.green.shade900,
       ),
+    );
+  }
+
+  Widget _legendItem({required Color color, required String label}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.grey.shade800, fontSize: 12),
+          ),
+        ),
+      ],
     );
   }
 }

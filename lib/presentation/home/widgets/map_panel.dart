@@ -10,6 +10,7 @@ class MapPanel extends StatelessWidget {
   final VoidCallback onToggleMapType;
   final String selectedRegionLabel;
   final Set<Polygon> cropMasks;
+  final Set<Marker> selectionMarkers;
 
   const MapPanel({
     super.key,
@@ -21,6 +22,7 @@ class MapPanel extends StatelessWidget {
     required this.onToggleMapType,
     required this.selectedRegionLabel,
     required this.cropMasks,
+    required this.selectionMarkers,
   });
 
   Widget _legendItem({required Color color, required String label}) {
@@ -60,17 +62,20 @@ class MapPanel extends StatelessWidget {
               mapToolbarEnabled: false,
               onMapCreated: onMapCreated,
               polygons: cropMasks,
+              markers: selectionMarkers,
             ),
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.10),
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.18),
-                  ],
+            IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.10),
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.18),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -126,53 +131,25 @@ class MapPanel extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.94),
                   borderRadius: BorderRadius.circular(22),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                child: Row(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _legendItem(
-                            color: const Color(0xFF4CAF50),
-                            label: 'Crop mask',
-                          ),
-                        ),
-                        Expanded(
-                          child: _legendItem(
-                            color: const Color(0xFF2196F3),
-                            label: 'Boundary',
-                          ),
-                        ),
-                        Expanded(
-                          child: _legendItem(
-                            color: const Color(0xFFF4B400),
-                            label: 'Satellite',
-                          ),
-                        ),
-                      ],
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: onSelectRegion,
+                        icon: const Icon(Icons.crop_free),
+                        label: const Text('Select area'),
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: onSelectRegion,
-                            icon: const Icon(Icons.crop_free),
-                            label: const Text('Select area'),
-                          ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: onRunAnalysis,
+                        icon: const Icon(Icons.analytics),
+                        label: const Text('Run U-Net'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: onRunAnalysis,
-                            icon: const Icon(Icons.analytics),
-                            label: const Text('Run U-Net'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
