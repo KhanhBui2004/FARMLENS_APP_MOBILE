@@ -1,24 +1,24 @@
 class StatisticsModel {
   final String id;
-  final String analysis_id;
-  final String created_at;
-  final ImageSizeModel image_size;
+  final String analysisId;
+  final String createdAt;
+  final ImageSizeModel imageSize;
   final ClassesModel classes;
 
   StatisticsModel({
     required this.id,
-    required this.analysis_id,
-    required this.created_at,
-    required this.image_size,
+    required this.analysisId,
+    required this.createdAt,
+    required this.imageSize,
     required this.classes,
   });
 
   factory StatisticsModel.fromJson(Map<String, dynamic> json) {
     return StatisticsModel(
       id: json['_id'] ?? json['id'],
-      analysis_id: json['analysis_id'],
-      created_at: json['created_at'],
-      image_size: ImageSizeModel.fromJson(json['image_size'] ?? {}),
+      analysisId: json['analysis_id'],
+      createdAt: json['created_at'],
+      imageSize: ImageSizeModel.fromJson(json['image_size'] ?? {}),
       classes: ClassesModel.fromJson(json['classes'] ?? {}),
     );
   }

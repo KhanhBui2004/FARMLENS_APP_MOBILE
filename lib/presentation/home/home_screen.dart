@@ -1,17 +1,17 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
 
+import 'package:farmlens_app/presentation/home/widgets/stats_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'widgets/header.dart';
 import 'widgets/map_panel.dart';
 import 'widgets/map_fullscreen_selector.dart';
-import 'widgets/stats_actions.dart';
+import 'widgets/actions_panel.dart';
 import 'widgets/export_section.dart';
 
 import 'package:farmlens_app/data/models/analysis/segmentation_model.dart';
 import 'package:farmlens_app/data/services/analysis/segmentation_service.dart';
+import 'package:farmlens_app/utils/constant/api_endpoints.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,8 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Completer<GoogleMapController>();
 
   MapType _currentMapType = MapType.normal;
-  DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
-  DateTime _endDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now();
   String _selectedRegion = 'Selected area: Central farm block';
   LatLng? _selectedLatLng;
   double _calculatedArea = 125.5;
@@ -35,8 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
   double _cloudCoverage = 18.0;
   Set<Polygon> _cropMasks = {};
   Set<Marker> _selectionMarkers = {};
-  Uint8List? _segmentationImageBytes;
+  String? _segmentationImageUrl;
   String? _segmentationImageError;
+  String? _sentinelImageUrl;
+  String? _sentinelImageError;
 
   CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(16.0544, 108.2022),
@@ -75,16 +76,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _selectTime() async {
-    final range = await showDateRangePicker(
+    final selectedDate = await showDatePicker(
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
-      initialDateRange: DateTimeRange(start: _startDate, end: _endDate),
+      initialDate: _selectedDate,
     );
-    if (range != null) {
+    if (selectedDate != null) {
       setState(() {
-        _startDate = range.start;
-        _endDate = range.end;
+        _selectedDate = selectedDate;
       });
     }
   }
@@ -96,31 +96,12 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       return;
     }
-    final String startDate =
-        '${_startDate.year.toString().padLeft(4, '0')}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')}';
-    final String endDate =
-        '${_endDate.year.toString().padLeft(4, '0')}-${_endDate.month.toString().padLeft(2, '0')}-${_endDate.day.toString().padLeft(2, '0')}';
+    final String date =
+        '${_selectedDate.year.toString().padLeft(4, '0')}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}';
     final double lat = _selectedLatLng!.latitude;
     final double lng = _selectedLatLng!.longitude;
-    // Generate simulated crop mask polygons
-    final List<LatLng> cropBoundary = [
-      const LatLng(16.050, 108.198),
-      const LatLng(16.055, 108.198),
-      const LatLng(16.058, 108.206),
-      const LatLng(16.052, 108.208),
-      const LatLng(16.048, 108.203),
-    ];
 
     setState(() {
-      _cropMasks = {
-        Polygon(
-          polygonId: const PolygonId('crop_mask_main'),
-          points: cropBoundary,
-          fillColor: const Color(0xFF4CAF50).withValues(alpha: 0.35),
-          strokeColor: const Color(0xFF2E7D32),
-          strokeWidth: 3,
-        ),
-      };
       _calculatedArea = 132.8;
       _changePercent = 8.9;
       _modelConfidence = 93.6;
@@ -133,13 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     try {
       final service = SegmentationService();
-      final result = await service.fetchSegmentation(
-        lat,
-        lng,
-        startDate,
-        endDate,
-        5,
-      );
+      final result = await service.fetchSegmentation(lat, lng, date, 5);
       if (result['code'] == 200) {
         final SegmentationModel data = result['data'];
         setState(() {
@@ -148,7 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
           _modelConfidence = 95.2;
           _cloudCoverage = data.cloud_cover;
         });
-        _setSegmentationImage(data.segmentation_base64);
+        _setSegmentationImage(data.segmentation_url);
+        _setSentinelImage(data.sentinel_image_url);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Segmentation analysis completed!')),
         );
@@ -178,29 +154,42 @@ class _HomeScreenState extends State<HomeScreen> {
     await controller.animateCamera(CameraUpdate.newCameraPosition(position));
   }
 
-  void _setSegmentationImage(String? base64Image) {
-    if (base64Image == null || base64Image.trim().isEmpty) {
+  void _setSegmentationImage(String? imageUrl) {
+    if (imageUrl == null || imageUrl.trim().isEmpty) {
       setState(() {
-        _segmentationImageBytes = null;
+        _segmentationImageUrl = null;
         _segmentationImageError = 'Segmentation image is empty.';
       });
       return;
     }
-    try {
-      final String cleaned = base64Image.contains(',')
-          ? base64Image.split(',').last
-          : base64Image;
-      final Uint8List bytes = base64Decode(cleaned);
+    final String normalized = imageUrl.startsWith('http')
+        ? imageUrl
+        : imageUrl.startsWith('/')
+        ? '${ApiEndpoints.baseUrl}$imageUrl'
+        : '${ApiEndpoints.baseUrl}/$imageUrl';
+    setState(() {
+      _segmentationImageUrl = normalized;
+      _segmentationImageError = null;
+    });
+  }
+
+  void _setSentinelImage(String? imageUrl) {
+    if (imageUrl == null || imageUrl.trim().isEmpty) {
       setState(() {
-        _segmentationImageBytes = bytes;
-        _segmentationImageError = null;
+        _sentinelImageUrl = null;
+        _sentinelImageError = 'Sentinel image is empty.';
       });
-    } catch (_) {
-      setState(() {
-        _segmentationImageBytes = null;
-        _segmentationImageError = 'Invalid segmentation image data.';
-      });
+      return;
     }
+    final String normalized = imageUrl.startsWith('http')
+        ? imageUrl
+        : imageUrl.startsWith('/')
+        ? '${ApiEndpoints.baseUrl}$imageUrl'
+        : '${ApiEndpoints.baseUrl}/$imageUrl';
+    setState(() {
+      _sentinelImageUrl = normalized;
+      _sentinelImageError = null;
+    });
   }
 
   @override
@@ -346,12 +335,79 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 18),
 
-                  if (_segmentationImageBytes != null ||
+                  if (_segmentationImageUrl != null ||
                       _segmentationImageError != null) ...[
                     _sectionTitle('Segmentation preview'),
                     const SizedBox(height: 10),
                     Column(
                       children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x1A000000),
+                                blurRadius: 16,
+                                offset: Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              _sentinelImageUrl == null
+                                  ? Text(
+                                      _sentinelImageError ??
+                                          'No sentinel preview available.',
+                                      style: const TextStyle(
+                                        color: Colors.redAccent,
+                                      ),
+                                    )
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.network(
+                                        _sentinelImageUrl!,
+                                        fit: BoxFit.contain,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                              return const Text(
+                                                'Unable to load sentinel image.',
+                                                style: TextStyle(
+                                                  color: Colors.redAccent,
+                                                ),
+                                              );
+                                            },
+                                      ),
+                                    ),
+                              SizedBox(height: 12),
+                              _segmentationImageUrl == null
+                                  ? Text(
+                                      _segmentationImageError ??
+                                          'No segmentation preview available.',
+                                      style: const TextStyle(
+                                        color: Colors.redAccent,
+                                      ),
+                                    )
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.network(
+                                        _segmentationImageUrl!,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return const Text(
+                                            'Unable to load segmentation image.',
+                                            style: TextStyle(
+                                              color: Colors.redAccent,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                            ],
+                          ),
+                        ),
                         Wrap(
                           alignment: WrapAlignment.center,
                           spacing: 12,
@@ -387,54 +443,28 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x1A000000),
-                                blurRadius: 16,
-                                offset: Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: _segmentationImageBytes == null
-                              ? Text(
-                                  _segmentationImageError ??
-                                      'No segmentation preview available.',
-                                  style: const TextStyle(
-                                    color: Colors.redAccent,
-                                  ),
-                                )
-                              : ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Image.memory(
-                                    _segmentationImageBytes!,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
+                        const SizedBox(height: 18),
+
+                        StatsPanel(
+                          area: _calculatedArea,
+                          changePercent: _changePercent,
+                          confidence: _modelConfidence,
+                          cloud: _cloudCoverage,
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 18),
                   ],
 
                   // Quick actions + stats
                   StatsActions(
                     area: _calculatedArea,
-                    changePercent: _changePercent,
-                    confidence: _modelConfidence,
-                    cloud: _cloudCoverage,
                     onSelectRegion: _selectRegion,
                     onSelectTime: _selectTime,
                     onRunAnalysis: _runAnalysis,
                   ),
                   const SizedBox(height: 18),
-
                   // Export
                   _sectionTitle('Report export'),
                   const SizedBox(height: 10),

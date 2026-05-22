@@ -13,8 +13,7 @@ class SegmentationService {
   Future<Map<String, dynamic>> fetchSegmentation(
     double lat,
     double lng,
-    String startDate,
-    String endDate,
+    String date,
     double cloudCover,
   ) async {
     try {
@@ -23,8 +22,7 @@ class SegmentationService {
         data: {
           'lat': lat,
           'lng': lng,
-          'start_date': startDate,
-          'end_date': endDate,
+          'date': date,
           'cloud_cover': cloudCover,
         },
       );
