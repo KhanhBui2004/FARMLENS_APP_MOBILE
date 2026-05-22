@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 class ChartPanel extends StatelessWidget {
   final StatisticsModel? latestStats;
 
-  const ChartPanel({
-    super.key,
-    required this.latestStats,
-  });
+  const ChartPanel({super.key, required this.latestStats});
 
   List<_LandCoverSlice> _buildLandCoverSlices(StatisticsModel stats) {
     final classes = stats.classes;
@@ -16,37 +13,37 @@ class ChartPanel extends StatelessWidget {
       _LandCoverSlice(
         label: 'Agriculture',
         percentage: classes.agriculture?.percentage ?? 0.0,
-        color: const Color.fromARGB(255, 255, 255, 0),
+        color: const Color(0xFFE0C35A), // vàng nông nghiệp
       ),
       _LandCoverSlice(
         label: 'Barren',
         percentage: classes.barren?.percentage ?? 0.0,
-        color: const Color.fromARGB(255, 232, 184, 153),
+        color: const Color(0xFFC49A6C), // nâu đất khô
       ),
       _LandCoverSlice(
         label: 'Forest',
         percentage: classes.forest?.percentage ?? 0.0,
-        color: const Color.fromARGB(255, 0, 255, 0),
+        color: const Color(0xFF2E7D32), // xanh lá đậm
       ),
       _LandCoverSlice(
         label: 'Rangeland',
         percentage: classes.rangeland?.percentage ?? 0.0,
-        color: const Color.fromARGB(255, 255, 0, 255),
+        color: const Color(0xFF8BC34A), // xanh cỏ
       ),
       _LandCoverSlice(
         label: 'Unknown',
         percentage: classes.unknown?.percentage ?? 0.0,
-        color: const Color.fromARGB(255, 0, 0, 0),
+        color: const Color(0xFF757575), // xám trung tính
       ),
       _LandCoverSlice(
         label: 'Urban',
         percentage: classes.urban?.percentage ?? 0.0,
-        color: const Color.fromARGB(255, 0, 255, 255),
+        color: const Color(0xFFE53935), // đỏ đô urban
       ),
       _LandCoverSlice(
         label: 'Water',
         percentage: classes.water?.percentage ?? 0.0,
-        color: const Color.fromARGB(255, 0, 0, 255),
+        color: const Color(0xFF1E88E5), // xanh nước
       ),
     ];
   }
@@ -109,25 +106,28 @@ class ChartPanel extends StatelessWidget {
               ),
             ],
           ),
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               SizedBox(
-                width: 220,
-                height: 220,
+                width: 180,
+                height: 180,
                 child: CustomPaint(painter: _PieChartPainter(slices: slices)),
               ),
               const SizedBox(height: 16),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 12,
-                runSpacing: 8,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: slices
                     .where((slice) => slice.percentage > 0)
                     .map(
-                      (slice) => _legendItem(
-                        color: slice.color,
-                        label:
-                            '${slice.label} (${slice.percentage.toStringAsFixed(1)}%)',
+                      (slice) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _legendItem(
+                          color: slice.color,
+                          label:
+                              '${slice.label} (${slice.percentage.toStringAsFixed(1)}%)',
+                        ),
                       ),
                     )
                     .toList(),

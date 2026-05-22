@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
 class StatsActions extends StatelessWidget {
-  final double area;
   final VoidCallback onSelectRegion;
   final VoidCallback onSelectTime;
   final VoidCallback onRunAnalysis;
 
   const StatsActions({
     super.key,
-    required this.area,
     required this.onSelectRegion,
     required this.onSelectTime,
     required this.onRunAnalysis,
@@ -137,8 +135,7 @@ class StatsActions extends StatelessWidget {
             _featureCard(
               icon: Icons.date_range,
               title: 'Select time',
-              description:
-                  'Choose the month or period for comparison.',
+              description: 'Choose the month or period for comparison.',
               color: const Color(0xFF1565C0),
               onTap: onSelectTime,
             ),
@@ -157,67 +154,6 @@ class StatsActions extends StatelessWidget {
               onTap: () {},
             ),
           ],
-        ),
-        const SizedBox(height: 18),
-        const Text(
-          'Time-series comparison',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x12000000),
-                blurRadius: 16,
-                offset: Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _timelineRow(
-                label: 'Current period',
-                value: '${area.toStringAsFixed(1)} ha',
-                progress: 0.82,
-                color: const Color(0xFF2E7D32),
-              ),
-              const SizedBox(height: 14),
-              _timelineRow(
-                label: 'Previous period',
-                value: '${(area - 10).toStringAsFixed(1)} ha',
-                progress: 0.64,
-                color: const Color(0xFF1565C0),
-              ),
-              const SizedBox(height: 14),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF4FBF4),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.insights, color: Color(0xFF2E7D32)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Crop area is trending upward, while cloud coverage remains within an acceptable range for analysis.',
-                        style: TextStyle(
-                          color: Colors.grey.shade800,
-                          height: 1.35,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
       ],
     );

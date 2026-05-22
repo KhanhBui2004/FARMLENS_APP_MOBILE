@@ -10,4 +10,5 @@ class ApiEndpoints {
   static const String deleteItem = '$baseUrl/items/delete';
   static const String fetchStatistics = '$baseUrl/analysis/statistics';
   static const String fetchSegmentation = '$baseUrl/analysis/segmentation';
+  static const String fetchChangeDetection = '$baseUrl/analysis/change-detection';
 }

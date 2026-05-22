@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:farmlens_app/presentation/widget/buttonCustom_widget.dart';
-import 'package:farmlens_app/presentation/widget/textInput_widget.dart';
+import 'package:farmlens_app/presentation/widgets/buttonCustom_widget.dart';
+import 'package:farmlens_app/presentation/widgets/textInput_widget.dart';
 import 'package:farmlens_app/presentation/auth/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {

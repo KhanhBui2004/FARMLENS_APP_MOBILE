@@ -25,8 +25,28 @@ class HomeHeader extends StatelessWidget {
             ),
             offset: const Offset(0, 42),
             onSelected: onMenuSelected,
-            itemBuilder: (BuildContext context) => const [
+            itemBuilder: (BuildContext context) => [
               PopupMenuItem<String>(
+                value: 'Home',
+                child: const Row(
+                  children: [
+                    Icon(Icons.home, color: Colors.black87),
+                    SizedBox(width: 12),
+                    Text('Home'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'Change Detection',
+                child: const Row(
+                  children: [
+                    Icon(Icons.change_history, color: Colors.black87),
+                    SizedBox(width: 12),
+                    Text('Change Detection'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
                 value: 'History',
                 child: Row(
                   children: [
@@ -36,7 +56,7 @@ class HomeHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              PopupMenuItem<String>(
+              const PopupMenuItem<String>(
                 value: 'Profile',
                 child: Row(
                   children: [
@@ -46,7 +66,7 @@ class HomeHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              PopupMenuItem<String>(
+              const PopupMenuItem<String>(
                 value: 'Logout',
                 child: Row(
                   children: [
@@ -77,23 +97,13 @@ class HomeHeader extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.green.shade900,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
-              ),
-            ],
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: Colors.green.shade900,
+            ),
           ),
         ),
       ],

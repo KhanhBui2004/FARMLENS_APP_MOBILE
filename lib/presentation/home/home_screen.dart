@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
 import 'package:farmlens_app/data/services/analysis/statistics_service.dart';
 import 'package:farmlens_app/presentation/home/widgets/chart_panel.dart';
+import 'package:farmlens_app/utils/router/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'widgets/header.dart';
-import 'widgets/map_panel.dart';
-import 'widgets/map_fullscreen_selector.dart';
+import '../widgets/header.dart';
+import '../widgets/map_panel.dart';
+import '../widgets/map_fullscreen_selector.dart';
 import 'widgets/actions_panel.dart';
 import 'widgets/export_section.dart';
 
@@ -38,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   double _changePercent = 12.4;
   double _modelConfidence = 91.0;
   double _cloudCoverage = 18.0;
-  Set<Polygon> _cropMasks = {};
   Set<Marker> _selectionMarkers = {};
   String? _segmentationId;
   String? _segmentationImageUrl;
@@ -52,9 +52,18 @@ class _HomeScreenState extends State<HomeScreen> {
   );
 
   void _handleMenuAction(String action) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Selected $action')));
+    switch (action) {
+      case 'Home':
+        Navigator.of(context).pushNamed(AppRoutes.home);
+        break;
+      case 'Change Detection':
+        Navigator.of(context).pushNamed(AppRoutes.changeDetection);
+        break;
+      default:
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Selected $action')));
+    }
   }
 
   Future<void> _selectRegion() async {
@@ -379,8 +388,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           : MapType.hybrid,
                     ),
                     selectedRegionLabel: _selectedRegion,
-                    cropMasks: _cropMasks,
                     selectionMarkers: _selectionMarkers,
+                  ),
+                  const SizedBox(height: 18),
+
+                  // Quick actions + stats
+                  StatsActions(
+                    onSelectRegion: _selectRegion,
+                    onSelectTime: _selectTime,
+                    onRunAnalysis: _runAnalysis,
                   ),
                   const SizedBox(height: 18),
 
@@ -494,13 +510,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 18),
 
-                        // StatsPanel(
-                        //   area: _calculatedArea,
-                        //   changePercent: _changePercent,
-                        //   confidence: _modelConfidence,
-                        //   cloud: _cloudCoverage,
-                        // ),
-                        // const SizedBox(height: 18),
                         ChartPanel(latestStats: _latestStats),
                       ],
                     ),
@@ -508,14 +517,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 18),
                   ],
 
-                  // Quick actions + stats
-                  StatsActions(
-                    area: _calculatedArea,
-                    onSelectRegion: _selectRegion,
-                    onSelectTime: _selectTime,
-                    onRunAnalysis: _runAnalysis,
-                  ),
-                  const SizedBox(height: 18),
                   // Export
                   _sectionTitle('Report export'),
                   const SizedBox(height: 10),

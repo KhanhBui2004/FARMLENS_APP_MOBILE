@@ -1,5 +1,6 @@
-import 'package:farmlens_app/presentation/home/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:farmlens_app/utils/router/app_router.dart';
+import 'package:farmlens_app/utils/router/app_routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +22,9 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF4F8F4),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      navigatorKey: AppRouter.navigatorKey,
+      initialRoute: AppRoutes.home,
+      onGenerateRoute: AppRouter.generateRoute,
     );
   }
 }

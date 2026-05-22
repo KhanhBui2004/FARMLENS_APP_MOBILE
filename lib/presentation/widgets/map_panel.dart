@@ -9,7 +9,6 @@ class MapPanel extends StatelessWidget {
   final VoidCallback onRunAnalysis;
   final VoidCallback onToggleMapType;
   final String selectedRegionLabel;
-  final Set<Polygon> cropMasks;
   final Set<Marker> selectionMarkers;
 
   const MapPanel({
@@ -21,7 +20,6 @@ class MapPanel extends StatelessWidget {
     required this.onRunAnalysis,
     required this.onToggleMapType,
     required this.selectedRegionLabel,
-    required this.cropMasks,
     required this.selectionMarkers,
   });
 
@@ -61,7 +59,6 @@ class MapPanel extends StatelessWidget {
               zoomControlsEnabled: false,
               mapToolbarEnabled: false,
               onMapCreated: onMapCreated,
-              polygons: cropMasks,
               markers: selectionMarkers,
             ),
             IgnorePointer(
@@ -145,7 +142,7 @@ class MapPanel extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: onRunAnalysis,
                         icon: const Icon(Icons.analytics),
-                        label: const Text('Run U-Net'),
+                        label: const Text('Run analysis'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                         ),
