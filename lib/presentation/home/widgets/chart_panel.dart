@@ -1,0 +1,203 @@
+import 'dart:math';
+import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
+import 'package:flutter/material.dart';
+
+class ChartPanel extends StatelessWidget {
+  final StatisticsModel? latestStats;
+
+  const ChartPanel({
+    super.key,
+    required this.latestStats,
+  });
+
+  List<_LandCoverSlice> _buildLandCoverSlices(StatisticsModel stats) {
+    final classes = stats.classes;
+    return [
+      _LandCoverSlice(
+        label: 'Agriculture',
+        percentage: classes.agriculture?.percentage ?? 0.0,
+        color: const Color.fromARGB(255, 255, 255, 0),
+      ),
+      _LandCoverSlice(
+        label: 'Barren',
+        percentage: classes.barren?.percentage ?? 0.0,
+        color: const Color.fromARGB(255, 232, 184, 153),
+      ),
+      _LandCoverSlice(
+        label: 'Forest',
+        percentage: classes.forest?.percentage ?? 0.0,
+        color: const Color.fromARGB(255, 0, 255, 0),
+      ),
+      _LandCoverSlice(
+        label: 'Rangeland',
+        percentage: classes.rangeland?.percentage ?? 0.0,
+        color: const Color.fromARGB(255, 255, 0, 255),
+      ),
+      _LandCoverSlice(
+        label: 'Unknown',
+        percentage: classes.unknown?.percentage ?? 0.0,
+        color: const Color.fromARGB(255, 0, 0, 0),
+      ),
+      _LandCoverSlice(
+        label: 'Urban',
+        percentage: classes.urban?.percentage ?? 0.0,
+        color: const Color.fromARGB(255, 0, 255, 255),
+      ),
+      _LandCoverSlice(
+        label: 'Water',
+        percentage: classes.water?.percentage ?? 0.0,
+        color: const Color.fromARGB(255, 0, 0, 255),
+      ),
+    ];
+  }
+
+  Widget _legendItem({required Color color, required String label}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.grey.shade800, fontSize: 12),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLandCoverChart() {
+    if (latestStats == null) {
+      return const SizedBox.shrink();
+    }
+    final slices = _buildLandCoverSlices(latestStats!);
+    final total = slices.fold<double>(
+      0.0,
+      (sum, item) => sum + item.percentage,
+    );
+    if (total <= 0) {
+      return const Text(
+        'No land cover statistics available yet.',
+        style: TextStyle(color: Colors.redAccent),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Land cover distribution',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x12000000),
+                blurRadius: 16,
+                offset: Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              SizedBox(
+                width: 220,
+                height: 220,
+                child: CustomPaint(painter: _PieChartPainter(slices: slices)),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
+                runSpacing: 8,
+                children: slices
+                    .where((slice) => slice.percentage > 0)
+                    .map(
+                      (slice) => _legendItem(
+                        color: slice.color,
+                        label:
+                            '${slice.label} (${slice.percentage.toStringAsFixed(1)}%)',
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildLandCoverChart();
+  }
+}
+
+class _LandCoverSlice {
+  final String label;
+  final double percentage;
+  final Color color;
+
+  const _LandCoverSlice({
+    required this.label,
+    required this.percentage,
+    required this.color,
+  });
+}
+
+class _PieChartPainter extends CustomPainter {
+  final List<_LandCoverSlice> slices;
+
+  const _PieChartPainter({required this.slices});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final total = slices.fold<double>(
+      0.0,
+      (sum, item) => sum + item.percentage,
+    );
+    if (total <= 0) {
+      return;
+    }
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = min(size.width, size.height) / 2;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    var startAngle = -pi / 2;
+    for (final slice in slices) {
+      if (slice.percentage <= 0) {
+        continue;
+      }
+      final sweepAngle = (slice.percentage / total) * 2 * pi;
+      final paint = Paint()
+        ..style = PaintingStyle.fill
+        ..color = slice.color;
+      canvas.drawArc(rect, startAngle, sweepAngle, true, paint);
+      startAngle += sweepAngle;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PieChartPainter oldDelegate) {
+    if (oldDelegate.slices.length != slices.length) {
+      return true;
+    }
+    for (var i = 0; i < slices.length; i++) {
+      if (oldDelegate.slices[i].percentage != slices[i].percentage) {
+        return true;
+      }
+    }
+    return false;
+  }
+}

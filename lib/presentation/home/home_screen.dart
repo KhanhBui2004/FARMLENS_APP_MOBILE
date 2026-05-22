@@ -1,6 +1,8 @@
 import 'dart:async';
 
-import 'package:farmlens_app/presentation/home/widgets/stats_panel.dart';
+import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
+import 'package:farmlens_app/data/services/analysis/statistics_service.dart';
+import 'package:farmlens_app/presentation/home/widgets/chart_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'widgets/header.dart';
@@ -24,6 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
+  final _statService = StatisticsService();
+
+  StatisticsModel? _latestStats;
+
   MapType _currentMapType = MapType.normal;
   DateTime _selectedDate = DateTime.now();
   String _selectedRegion = 'Selected area: Central farm block';
@@ -34,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double _cloudCoverage = 18.0;
   Set<Polygon> _cropMasks = {};
   Set<Marker> _selectionMarkers = {};
+  String? _segmentationId;
   String? _segmentationImageUrl;
   String? _segmentationImageError;
   String? _sentinelImageUrl;
@@ -106,6 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _changePercent = 8.9;
       _modelConfidence = 93.6;
       _cloudCoverage = 14.2;
+      _latestStats = null;
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -123,8 +131,12 @@ class _HomeScreenState extends State<HomeScreen> {
           _modelConfidence = 95.2;
           _cloudCoverage = data.cloud_cover;
         });
+        _segmentationId = data.id;
         _setSegmentationImage(data.segmentation_url);
         _setSentinelImage(data.sentinel_image_url);
+        if (_segmentationId != null && _segmentationId!.isNotEmpty) {
+          await _statistic();
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Segmentation analysis completed!')),
         );
@@ -138,6 +150,43 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Error during analysis: $e')));
       debugPrint('Error during analysis: $e');
+    }
+  }
+
+  Future<void> _statistic() async {
+    if (_segmentationId == null || _segmentationId!.isEmpty) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Fetching statistics data...')),
+    );
+    try {
+      // Implement statistics fetching logic here
+      final result = await _statService.fetchStatistics(
+        analysisId: _segmentationId,
+      );
+      if (result['code'] == 200) {
+        final StatisticsModel data = result['data'];
+        setState(() {
+          _latestStats = data;
+        });
+        debugPrint('Statistics data: ${data.toString()}');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to fetch statistics: ${result['message']}'),
+          ),
+        );
+      }
+      // await Future.delayed(const Duration(seconds: 2));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Statistics data fetched successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error fetching statistics: $e')));
+      debugPrint('Error fetching statistics: $e');
     }
   }
 
@@ -445,12 +494,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 18),
 
-                        StatsPanel(
-                          area: _calculatedArea,
-                          changePercent: _changePercent,
-                          confidence: _modelConfidence,
-                          cloud: _cloudCoverage,
-                        ),
+                        // StatsPanel(
+                        //   area: _calculatedArea,
+                        //   changePercent: _changePercent,
+                        //   confidence: _modelConfidence,
+                        //   cloud: _cloudCoverage,
+                        // ),
+                        // const SizedBox(height: 18),
+                        ChartPanel(latestStats: _latestStats),
                       ],
                     ),
 
