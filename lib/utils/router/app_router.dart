@@ -1,7 +1,7 @@
 import 'package:farmlens_app/presentation/auth/login_screen.dart';
 import 'package:farmlens_app/presentation/auth/register_screen.dart';
-import 'package:farmlens_app/presentation/change_detection/change_detection_screen.dart';
 import 'package:farmlens_app/presentation/home/home_screen.dart';
+import 'package:farmlens_app/presentation/history/history_screen.dart';
 import 'package:flutter/material.dart';
 import 'app_routes.dart';
 
@@ -16,8 +16,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case AppRoutes.register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
-      case AppRoutes.changeDetection:
-        return MaterialPageRoute(builder: (_) => const ChangeDetectionScreen());
+      case AppRoutes.history:
+        return MaterialPageRoute(builder: (_) => const HistoryScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

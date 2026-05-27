@@ -36,16 +36,6 @@ class HomeHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              PopupMenuItem<String>(
-                value: 'Change Detection',
-                child: const Row(
-                  children: [
-                    Icon(Icons.change_history, color: Colors.black87),
-                    SizedBox(width: 12),
-                    Text('Change Detection'),
-                  ],
-                ),
-              ),
               const PopupMenuItem<String>(
                 value: 'History',
                 child: Row(

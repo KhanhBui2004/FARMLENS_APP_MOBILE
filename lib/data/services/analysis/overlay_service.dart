@@ -1,84 +1,82 @@
-// import 'package:farmlens_app/data/services/network/api_client.dart';
+import 'package:dio/dio.dart';
+import 'package:farmlens_app/data/models/analysis/overlay_model.dart';
+import 'dart:async';
+
 import 'package:farmlens_app/data/services/network/api_client.dart';
 import 'package:farmlens_app/utils/constant/api_endpoints.dart';
-import 'dart:async';
-import 'package:dio/dio.dart';
-import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class StatisticsService {
+class OverlayService {
   final Dio _dio;
-  StatisticsService({Dio? dio}) : _dio = dio ?? ApiClient.dio;
+  OverlayService({Dio? dio}) : _dio = dio ?? ApiClient.dio;
 
-  Future<Map<String, dynamic>> fetchStatistics({String? analysisId}) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      final payload = <String, dynamic>{'analysis_id': analysisId};
-      payload.removeWhere((key, value) => value == null);
-      final response = await _dio.post(
-        ApiEndpoints.fetchStatistics,
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-        data: payload,
-      );
-      final data = response.data;
-      return {
-        'code': data['code'],
-        'message': data['message'],
-        'data': StatisticsModel.fromJson(data['data']),
-      };
-    } on DioException catch (e) {
-      throw Exception('Failed to fetch statistics data: ${e.message}');
-    }
-  }
-
-  Future<Map<String, dynamic>> fetchStatisticsById(String analysisId) async {
+  Future<Map<String, dynamic>> fetchOverlay(String analysisId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       final response = await _dio.get(
-        ApiEndpoints.fetchStatistics,
+        ApiEndpoints.fetchOverlay,
         options: Options(headers: {'Authorization': 'Bearer $token'}),
         queryParameters: {'analysis_id': analysisId},
+      );
+      final data = response.data;
+      return {
+        'code': data['code'],
+        'message': data['message'],
+        'data': OverlayModel.fromJson(data['data']),
+      };
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch overlay data: ${e.message}');
+    }
+  }
+
+  Future<Map<String, dynamic>> postOverlay(String analysisId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await _dio.post(
+        ApiEndpoints.fetchOverlay,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        data: {'analysis_id': analysisId},
       );
       final data = response.data;
 
       return {
         'code': data['code'],
         'message': data['message'],
-        'data': StatisticsModel.fromJson(data['data']),
+        'data': OverlayModel.fromJson(data['data']),
       };
     } on DioException catch (e) {
-      throw Exception('Failed to fetch statistics data: ${e.message}');
+      throw Exception('Failed to fetch overlay data: ${e.message}');
     }
   }
 
-  Future<Map<String, dynamic>> deleteStatisticsById(String analysisId) async {
+  Future<Map<String, dynamic>> deleteOverlay(String analysisId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       final response = await _dio.delete(
-        '${ApiEndpoints.fetchStatistics}/$analysisId',
+        '${ApiEndpoints.fetchOverlay}/$analysisId',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
       final data = response.data;
 
       return {'code': data['code'], 'message': data['message']};
     } on DioException catch (e) {
-      throw Exception('Failed to delete statistics data: ${e.message}');
+      throw Exception('Failed to delete overlay data: ${e.message}');
     }
   }
 
-  Future<Map<String, dynamic>> deleteAllStatistics() async {
+  Future<Map<String, dynamic>> deleteAllOverlay() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       final response = await _dio.delete(
-        ApiEndpoints.fetchStatistics,
+        ApiEndpoints.fetchOverlay,
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
       final data = response.data;
@@ -89,7 +87,7 @@ class StatisticsService {
         'count': data['deleted'],
       };
     } on DioException catch (e) {
-      throw Exception('Failed to delete statistics data: ${e.message}');
+      throw Exception('Failed to delete overlay data: ${e.message}');
     }
   }
 }

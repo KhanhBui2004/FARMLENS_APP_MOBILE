@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class StatsActions extends StatelessWidget {
-  final VoidCallback onSelectRegion;
-  final VoidCallback onSelectTime;
+  final VoidCallback onSelectFirstTime;
+  final VoidCallback onSelectSecondTime;
   final VoidCallback onRunAnalysis;
+  final VoidCallback onChangeDetection;
 
   const StatsActions({
     super.key,
-    required this.onSelectRegion,
-    required this.onSelectTime,
+    required this.onSelectFirstTime,
+    required this.onSelectSecondTime,
     required this.onRunAnalysis,
+    required this.onChangeDetection,
   });
 
   Widget _featureCard({
@@ -126,32 +128,32 @@ class StatsActions extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           children: [
             _featureCard(
-              icon: Icons.crop_free,
-              title: 'Select area',
-              description: 'Draw or pick the field to analyze on the map.',
+              icon: Icons.date_range,
+              title: 'Select First Time',
+              description: 'Choose the time for analysis.',
               color: const Color(0xFF2E7D32),
-              onTap: onSelectRegion,
+              onTap: onSelectFirstTime,
             ),
             _featureCard(
               icon: Icons.date_range,
-              title: 'Select time',
-              description: 'Choose the month or period for comparison.',
+              title: 'Select Second Time',
+              description: 'Choose the time for comparison.',
               color: const Color(0xFF1565C0),
-              onTap: onSelectTime,
+              onTap: onSelectSecondTime,
             ),
             _featureCard(
-              icon: Icons.auto_graph,
-              title: 'Vegetation change',
-              description: 'Inspect crop growth variation across time.',
+              icon: Icons.analytics,
+              title: 'Run Analysis',
+              description: 'Run the analysis on the selected data.',
               color: const Color(0xFFF57C00),
               onTap: onRunAnalysis,
             ),
             _featureCard(
-              icon: Icons.file_download,
-              title: 'Export results',
-              description: 'Generate a report for assessment.',
+              icon: Icons.compare_arrows,
+              title: 'Change Detection',
+              description: 'Detect changes in the selected data.',
               color: const Color(0xFF6D4C41),
-              onTap: () {},
+              onTap: onChangeDetection,
             ),
           ],
         ),

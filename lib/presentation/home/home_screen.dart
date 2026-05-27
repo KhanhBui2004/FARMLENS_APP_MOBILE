@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:farmlens_app/data/models/analysis/comparison_model.dart';
 import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
+import 'package:farmlens_app/data/services/analysis/comparison_service.dart';
 import 'package:farmlens_app/data/services/analysis/statistics_service.dart';
 import 'package:farmlens_app/presentation/home/widgets/chart_panel.dart';
+import 'package:farmlens_app/presentation/home/widgets/comparison_panel.dart';
 import 'package:farmlens_app/utils/router/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,6 +17,7 @@ import 'widgets/export_section.dart';
 
 import 'package:farmlens_app/data/models/analysis/segmentation_model.dart';
 import 'package:farmlens_app/data/services/analysis/segmentation_service.dart';
+import 'package:farmlens_app/data/services/auth/auth_service.dart';
 import 'package:farmlens_app/utils/constant/api_endpoints.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,11 +32,18 @@ class _HomeScreenState extends State<HomeScreen> {
       Completer<GoogleMapController>();
 
   final _statService = StatisticsService();
+  final ComparisonService _comparisonService = ComparisonService();
+
+  ComparisonModel? _comparisonResult;
+  String? _comparisonError;
 
   StatisticsModel? _latestStats;
 
+  final _authService = AuthService();
+
   MapType _currentMapType = MapType.normal;
-  DateTime _selectedDate = DateTime.now();
+  DateTime _firstDate = DateTime.now();
+  DateTime _secondDate = DateTime.now();
   String _selectedRegion = 'Selected area: Central farm block';
   LatLng? _selectedLatLng;
   double _calculatedArea = 125.5;
@@ -56,8 +67,16 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'Home':
         Navigator.of(context).pushNamed(AppRoutes.home);
         break;
-      case 'Change Detection':
-        Navigator.of(context).pushNamed(AppRoutes.changeDetection);
+      case 'Logout':
+        // Implement logout logic here
+        _authService.logout();
+        Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Logged out successfully!')),
+        );
+        break;
+      case 'History':
+        Navigator.of(context).pushNamed(AppRoutes.history);
         break;
       default:
         ScaffoldMessenger.of(
@@ -91,16 +110,30 @@ class _HomeScreenState extends State<HomeScreen> {
     await _moveCamera(_kGooglePlex);
   }
 
-  void _selectTime() async {
+  void _selectFirstTime() async {
     final selectedDate = await showDatePicker(
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
-      initialDate: _selectedDate,
+      initialDate: _firstDate,
     );
     if (selectedDate != null) {
       setState(() {
-        _selectedDate = selectedDate;
+        _firstDate = selectedDate;
+      });
+    }
+  }
+
+  void _selectSecondTime() async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDate: _secondDate,
+    );
+    if (selectedDate != null) {
+      setState(() {
+        _secondDate = selectedDate;
       });
     }
   }
@@ -113,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
     final String date =
-        '${_selectedDate.year.toString().padLeft(4, '0')}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}';
+        '${_firstDate.year.toString().padLeft(4, '0')}-${_firstDate.month.toString().padLeft(2, '0')}-${_firstDate.day.toString().padLeft(2, '0')}';
     final double lat = _selectedLatLng!.latitude;
     final double lng = _selectedLatLng!.longitude;
 
@@ -187,7 +220,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       }
-      // await Future.delayed(const Duration(seconds: 2));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Statistics data fetched successfully!')),
       );
@@ -196,6 +228,65 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Error fetching statistics: $e')));
       debugPrint('Error fetching statistics: $e');
+    }
+  }
+
+  Future<void> _runDetection() async {
+    if (_selectedLatLng == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a location on the map.')),
+      );
+      return;
+    }
+    final String date1 =
+        '${_firstDate.year.toString().padLeft(4, '0')}-${_firstDate.month.toString().padLeft(2, '0')}-${_firstDate.day.toString().padLeft(2, '0')}';
+    final String date2 =
+        '${_secondDate.year.toString().padLeft(4, '0')}-${_secondDate.month.toString().padLeft(2, '0')}-${_secondDate.day.toString().padLeft(2, '0')}';
+    final double lat = _selectedLatLng!.latitude;
+    final double lng = _selectedLatLng!.longitude;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Running satellite segmentation pipeline...'),
+      ),
+    );
+    try {
+      setState(() {
+        _comparisonResult = null;
+        _comparisonError = null;
+      });
+      final result = await _comparisonService.fetchComparison(
+        lat: lat,
+        lng: lng,
+        date1: date1,
+        date2: date2,
+        cloudCover: 20,
+      );
+      if (result['code'] == 200) {
+        setState(() {
+          _comparisonResult = result['data'] as ComparisonModel;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Change detection results retrieved successfully!'),
+          ),
+        );
+      } else {
+        setState(() {
+          _comparisonError = result['message']?.toString();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Analysis failed: ${result['message']}')),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _comparisonError = e.toString();
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error during analysis: $e')));
+      debugPrint('Error during analysis: $e');
     }
   }
 
@@ -381,7 +472,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mapType: _currentMapType,
                     onMapCreated: _onMapCreated,
                     onSelectRegion: _selectRegion,
-                    onRunAnalysis: _runAnalysis,
+                    // onRunAnalysis: _runAnalysis,
                     onToggleMapType: () => setState(
                       () => _currentMapType = _currentMapType == MapType.hybrid
                           ? MapType.normal
@@ -394,9 +485,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   // Quick actions + stats
                   StatsActions(
-                    onSelectRegion: _selectRegion,
-                    onSelectTime: _selectTime,
+                    onSelectFirstTime: _selectFirstTime,
+                    onSelectSecondTime: _selectSecondTime,
                     onRunAnalysis: _runAnalysis,
+                    onChangeDetection: _runDetection,
                   ),
                   const SizedBox(height: 18),
 
@@ -516,6 +608,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 18),
                   ],
+                  ComparisonPanel(
+                    result: _comparisonResult,
+                    error: _comparisonError,
+                  ),
+                  if (_comparisonResult != null || _comparisonError != null)
+                    const SizedBox(height: 18),
 
                   // Export
                   _sectionTitle('Report export'),

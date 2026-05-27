@@ -6,7 +6,6 @@ class MapPanel extends StatelessWidget {
   final MapType mapType;
   final void Function(GoogleMapController) onMapCreated;
   final VoidCallback onSelectRegion;
-  final VoidCallback onRunAnalysis;
   final VoidCallback onToggleMapType;
   final String selectedRegionLabel;
   final Set<Marker> selectionMarkers;
@@ -17,7 +16,6 @@ class MapPanel extends StatelessWidget {
     required this.mapType,
     required this.onMapCreated,
     required this.onSelectRegion,
-    required this.onRunAnalysis,
     required this.onToggleMapType,
     required this.selectedRegionLabel,
     required this.selectionMarkers,
@@ -120,35 +118,18 @@ class MapPanel extends StatelessWidget {
             ),
             Positioned(
               left: 14,
-              right: 14,
               bottom: 14,
+              width: 50,
+              height: 50,
               child: Container(
-                padding: const EdgeInsets.all(14),
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.94),
+                  color: const Color.fromARGB(255, 27, 94, 32).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(22),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onSelectRegion,
-                        icon: const Icon(Icons.crop_free),
-                        label: const Text('Select area'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: onRunAnalysis,
-                        icon: const Icon(Icons.analytics),
-                        label: const Text('Run analysis'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                        ),
-                      ),
-                    ),
-                  ],
+                child: IconButton(
+                  onPressed: onSelectRegion,
+                  icon: const Icon(Icons.crop_free),
                 ),
               ),
             ),

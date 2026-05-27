@@ -5,8 +5,8 @@ class ApiClient {
   static final Dio dio = Dio(
     BaseOptions(
       baseUrl: 'https://warless-aden-atavistically.ngrok-free.dev',
-      connectTimeout: Duration(seconds: 15),
-      receiveTimeout: Duration(seconds: 15),
+      connectTimeout: Duration(seconds: 30),
+      receiveTimeout: Duration(seconds: 60),
     ),
   )..interceptors.add(AuthInterceptor());
 }
