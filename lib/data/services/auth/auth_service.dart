@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:farmlens_app/data/models/auth/user_model.dart';
 import 'package:farmlens_app/data/services/network/api_client.dart';
 import 'package:farmlens_app/utils/constant/api_endpoints.dart';
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {

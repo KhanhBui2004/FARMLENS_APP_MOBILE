@@ -6,6 +6,11 @@ import 'package:farmlens_app/data/services/analysis/overlay_service.dart';
 import 'package:farmlens_app/data/services/analysis/segmentation_service.dart';
 import 'package:farmlens_app/data/services/analysis/statistics_service.dart';
 import 'package:farmlens_app/data/services/auth/auth_service.dart';
+import 'package:farmlens_app/presentation/history/widgets/change_detection_list.dart';
+import 'package:farmlens_app/presentation/history/widgets/comparison_details_sheet.dart';
+import 'package:farmlens_app/presentation/history/widgets/history_tab_selector.dart';
+import 'package:farmlens_app/presentation/history/widgets/segmentation_details_sheet.dart';
+import 'package:farmlens_app/presentation/history/widgets/segmentation_list.dart';
 import 'package:farmlens_app/presentation/widgets/header.dart';
 import 'package:farmlens_app/utils/router/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -176,7 +181,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  Future<void> _fetchStatisticsData(String analysisId) async {
+  Future<StatisticsModel?> _fetchStatisticsData(String analysisId) async {
     try {
       final result = await _statisticsService.fetchStatisticsById(analysisId);
       if (result['code'] == 200) {
@@ -186,7 +191,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
         );
         _statisticsData = result['data'];
-        setState(() {});
+        return result['data'] as StatisticsModel;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -195,11 +200,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
         );
+        return null;
       }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
+      return null;
     }
   }
 
@@ -392,6 +399,31 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
+  void _showSegmentationDetails(SegmentationModel item) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return SegmentationDetailsSheet(
+          item: item,
+          statisticsFuture: _fetchStatisticsData(item.id),
+        );
+      },
+    );
+  }
+
+  void _showComparisonDetails(ComparisonModel item) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return ComparisonDetailsSheet(item: item);
+      },
+    );
+  }
+
   Future<void> _deleteOverlayData(String analysisId) async {
     try {
       final result = await _overlayService.deleteOverlay(analysisId);
@@ -436,261 +468,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
-  }
-
-  Widget _buildTabSelector() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildTabButton(
-              label: 'Segmentation list',
-              isActive: _isSegmentationTab,
-              onTap: () => setState(() => _isSegmentationTab = true),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: _buildTabButton(
-              label: 'Change detection list',
-              isActive: !_isSegmentationTab,
-              onTap: () => setState(() => _isSegmentationTab = false),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabButton({
-    required String label,
-    required bool isActive,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: isActive ? const Color(0xFF3F8E5A) : Colors.transparent,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isActive ? Colors.white : const Color(0xFF2B4A32),
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSegmentationList() {
-    if (_segmentationData.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 24),
-          child: Text('No segmentation history yet.'),
-        ),
-      );
-    }
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              child: const Row(
-                children: [
-                  Icon(Icons.history, color: Color(0xFF3F8E5A)),
-                  SizedBox(width: 8),
-                  Text(
-                    'Your History',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2B4A32),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            TextButton(
-              onPressed: _confirmDeleteAllSegmentation,
-              child: const Text(
-                'Delete all',
-                style: TextStyle(
-                  color: Color(0xFFEF5350),
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _segmentationData.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final item = _segmentationData[index];
-            return _buildCard(
-              title: 'Analysis ${index + 1}',
-              subtitle: 'Date: ${item.date}',
-              lines: [
-                'Cloud cover: ${item.cloud_cover.toStringAsFixed(1)}%',
-                'Area: ${item.pixel_area_m2.toStringAsFixed(2)} m2',
-                'Location: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
-              ],
-              onTap: () {
-                _fetchStatisticsData(item.id);
-                _fetchOverlayData(item.id);
-              },
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChangeDetectionList() {
-    if (_changeDetectionData.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 24),
-          child: Text('No change detection history yet.'),
-        ),
-      );
-    }
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              child: const Row(
-                children: [
-                  Icon(Icons.history, color: Color(0xFF3F8E5A)),
-                  SizedBox(width: 8),
-                  Text(
-                    'Your History',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2B4A32),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            TextButton(
-              onPressed: _confirmDeleteAllChangeDetection,
-              child: Text(
-                'Delete all',
-                style: TextStyle(
-                  color: Color(0xFFEF5350),
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _changeDetectionData.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final item = _changeDetectionData[index];
-            final dateRange = item.dates.isNotEmpty
-                ? '${item.dates.first} -> ${item.dates.last}'
-                : 'No dates';
-            return _buildCard(
-              title: 'Change detection ${index + 1}',
-              subtitle: 'Created: ${item.created_at}',
-              lines: [
-                'Dates: $dateRange',
-                'Cloud cover: ${item.cloud_cover.toStringAsFixed(1)}%',
-                'Timeline items: ${item.timeline.length}',
-                'Location: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
-              ],
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCard({
-    required String title,
-    required String subtitle,
-    required List<String> lines,
-    VoidCallback? onTap,
-  }) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1F3B2D),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: Color(0xFF4A6B57),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 10),
-              ...lines.map(
-                (text) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    text,
-                    style: const TextStyle(color: Color(0xFF2F4F3D)),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -751,12 +528,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  _buildTabSelector(),
+                  HistoryTabSelector(
+                    isSegmentationTab: _isSegmentationTab,
+                    onSegmentationTap: () =>
+                        setState(() => _isSegmentationTab = true),
+                    onChangeDetectionTap: () =>
+                        setState(() => _isSegmentationTab = false),
+                  ),
                   const SizedBox(height: 16),
                   if (_isSegmentationTab)
-                    _buildSegmentationList()
+                    SegmentationList(
+                      items: _segmentationData,
+                      onDeleteAll: _confirmDeleteAllSegmentation,
+                      onItemTap: _showSegmentationDetails,
+                    )
                   else
-                    _buildChangeDetectionList(),
+                    ChangeDetectionList(
+                      items: _changeDetectionData,
+                      onDeleteAll: _confirmDeleteAllChangeDetection,
+                      onItemTap: _showComparisonDetails,
+                    ),
                 ],
               ),
             ),
