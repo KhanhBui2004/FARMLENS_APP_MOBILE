@@ -38,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         username: _usernameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
-        fullName: _fullNameController.text.trim()
+        fullName: _fullNameController.text.trim(),
       );
       if (response['code'] == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -63,90 +63,146 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 12),
-                Icon(
-                  Icons.person_add_alt_1,
-                  size: 64,
-                  color: colorScheme.primary,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Create Account',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 166, 49, 49),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Create your account to continue',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 204, 124, 124),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                TextInputWidget(
-                  hintText: 'Full name',
-                  obscureText: false,
-                  keyboardType: TextInputType.text,
-                  controller: _fullNameController,
-                ),
-                const SizedBox(height: 16),
-                TextInputWidget(
-                  hintText: 'Email',
-                  obscureText: false,
-                  keyboardType: TextInputType.emailAddress,
-                  controller: _emailController,
-                ),
-                const SizedBox(height: 16),
-                TextInputWidget(
-                  hintText: 'Username',
-                  obscureText: false,
-                  keyboardType: TextInputType.text,
-                  controller: _usernameController,
-                ),
-                const SizedBox(height: 16),
-                TextInputWidget(
-                  hintText: 'Password',
-                  obscureText: true,
-                  keyboardType: TextInputType.text,
-                  controller: _passwordController,
-                ),
-                const SizedBox(height: 16),
-                TextInputWidget(
-                  hintText: 'Confirm password',
-                  obscureText: true,
-                  keyboardType: TextInputType.text,
-                  controller: _confirmPasswordController,
-                ),
-                const SizedBox(height: 24),
-                ButtonCustomWidget(text: 'Register', onPressed: _submit),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ),
-                  ),
-                  child: const Text('Already have an account? Sign in'),
-                ),
-              ],
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFF6FBF5),
+                  Color(0xFFEAF4EA),
+                  Color(0xFFFDFEFE),
+                ],
+              ),
             ),
           ),
-        ),
+          Positioned(
+            top: -60,
+            right: -30,
+            child: Container(
+              width: 180,
+              height: 180,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3F8E5A).withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 120,
+            left: -70,
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2E7D32).withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 12),
+                    Icon(
+                      Icons.person_add_alt_1,
+                      size: 64,
+                      color: colorScheme.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Create Account',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.primary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Create your account to continue',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: colorScheme.primary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    TextInputWidget(
+                      hintText: 'Full name',
+                      obscureText: false,
+                      keyboardType: TextInputType.text,
+                      controller: _fullNameController,
+                    ),
+                    const SizedBox(height: 16),
+                    TextInputWidget(
+                      hintText: 'Email',
+                      obscureText: false,
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _emailController,
+                    ),
+                    const SizedBox(height: 16),
+                    TextInputWidget(
+                      hintText: 'Username',
+                      obscureText: false,
+                      keyboardType: TextInputType.text,
+                      controller: _usernameController,
+                    ),
+                    const SizedBox(height: 16),
+                    TextInputWidget(
+                      hintText: 'Password',
+                      obscureText: true,
+                      keyboardType: TextInputType.text,
+                      controller: _passwordController,
+                    ),
+                    const SizedBox(height: 16),
+                    TextInputWidget(
+                      hintText: 'Confirm password',
+                      obscureText: true,
+                      keyboardType: TextInputType.text,
+                      controller: _confirmPasswordController,
+                    ),
+                    const SizedBox(height: 24),
+                    ButtonCustomWidget(text: 'Register', onPressed: _submit),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Already have an account?"),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Sign in',
+                            style: TextStyle(
+                              color: colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

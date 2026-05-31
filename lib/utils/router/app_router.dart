@@ -1,5 +1,6 @@
 import 'package:farmlens_app/presentation/auth/login_screen.dart';
 import 'package:farmlens_app/presentation/auth/register_screen.dart';
+import 'package:farmlens_app/presentation/auth/welcome_screen.dart';
 import 'package:farmlens_app/presentation/home/home_screen.dart';
 import 'package:farmlens_app/presentation/history/history_screen.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,8 @@ class AppRouter {
       GlobalKey<NavigatorState>();
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case AppRoutes.welcome:
+        return MaterialPageRoute(builder: (_) => const WelcomeScreen());
       case AppRoutes.home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case AppRoutes.login:

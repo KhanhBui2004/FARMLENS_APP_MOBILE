@@ -55,78 +55,136 @@ class _LoginScreenState extends State<LoginScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 12),
-                Text(
-                  'Login Here',
-                  style: TextStyle(
-                    fontSize: 35,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  'Welcome back! Please login to your account.',
-                  style: TextStyle(fontSize: 16, color: colorScheme.primary),
-                  textAlign: TextAlign.center,
-                ),
-                // Icon(Icons.login, size: 64, color: colorScheme.primary),
-                const SizedBox(height: 12),
-                TextInputWidget(
-                  hintText: 'Username or Email',
-                  obscureText: false,
-                  keyboardType: TextInputType.text,
-                  controller: _identifierController,
-                ),
-                const SizedBox(height: 16),
-                TextInputWidget(
-                  hintText: 'Password',
-                  obscureText: true,
-                  keyboardType: TextInputType.text,
-                  controller: _passwordController,
-                ),
-                const SizedBox(height: 24),
-                GestureDetector(
-                  onTap: _submit,
-                  child: const ButtonCustomWidget(text: 'Login'),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFF6FBF5),
+                  Color(0xFFEAF4EA),
+                  Color(0xFFFDFEFE),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: -60,
+            right: -30,
+            child: Container(
+              width: 180,
+              height: 180,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3F8E5A).withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 120,
+            left: -70,
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2E7D32).withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text("Don't have an account?"),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterScreen(),
+                    const SizedBox(height: 12),
+                    Icon(Icons.person, size: 64, color: colorScheme.primary),
+                    Text(
+                      'Login Here',
+                      style: TextStyle(
+                        fontSize: 35,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.primary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      'Welcome back! Please login to your account.',
+                      style: TextStyle(fontSize: 16, color: colorScheme.primary),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    TextInputWidget(
+                      hintText: 'Username or Email',
+                      obscureText: false,
+                      keyboardType: TextInputType.text,
+                      controller: _identifierController,
+                    ),
+                    const SizedBox(height: 16),
+                    TextInputWidget(
+                      hintText: 'Password',
+                      obscureText: true,
+                      keyboardType: TextInputType.text,
+                      controller: _passwordController,
+                    ),
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          // Handle forgot password logic
+                        },
+                        child: const Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.deepOrange,
+                            fontWeight: FontWeight.bold,
                           ),
-                        );
-                      },
-                      child: Text(
-                        'Register',
-                        style: TextStyle(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    GestureDetector(
+                      onTap: _submit,
+                      child: const ButtonCustomWidget(text: 'Login'),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Don't have an account?"),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const RegisterScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Sign up',
+                            style: TextStyle(
+                              color: colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

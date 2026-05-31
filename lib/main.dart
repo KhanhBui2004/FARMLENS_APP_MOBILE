@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       navigatorKey: AppRouter.navigatorKey,
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.welcome,
       onGenerateRoute: AppRouter.generateRoute,
     );
   }
