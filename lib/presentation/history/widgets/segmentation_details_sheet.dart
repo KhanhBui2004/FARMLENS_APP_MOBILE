@@ -1,5 +1,6 @@
 import 'package:farmlens_app/data/models/analysis/segmentation_model.dart';
 import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
+import 'package:farmlens_app/utils/constant/api_endpoints.dart';
 import 'package:flutter/material.dart';
 
 class SegmentationDetailsSheet extends StatelessWidget {
@@ -52,7 +53,7 @@ class SegmentationDetailsSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _DetailRow('Analysis ID', item.id),
-                  _DetailRow('Date', item.date),
+                  _DetailRow('Segmentation Date', item.date),
                   _DetailRow(
                     'Location',
                     '${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
@@ -61,15 +62,86 @@ class SegmentationDetailsSheet extends StatelessWidget {
                     'Cloud cover',
                     '${item.cloud_cover.toStringAsFixed(1)}%',
                   ),
-                  _DetailRow(
-                    'Pixel area',
-                    '${item.pixel_area_m2.toStringAsFixed(2)} m2',
+                  Text(
+                    'Sentinel image',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF4A6B57),
+                    ),
                   ),
-                  _DetailRow('Sentinel image', item.sentinel_image_url),
-                  _DetailRow('Segmentation image', item.segmentation_url),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      '${ApiEndpoints.baseUrl}${item.sentinel_image_url}',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Text(
+                          'Unable to load sentinel image.',
+                          style: TextStyle(color: Colors.redAccent),
+                        );
+                      },
+                    ),
+                  ),
+                  Text(
+                    'Segmentation image',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF4A6B57),
+                    ),
+                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      '${ApiEndpoints.baseUrl}${item.segmentation_url}',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Text(
+                          'Unable to load segmentation image.',
+                          style: TextStyle(color: Colors.redAccent),
+                        );
+                      },
+                    ),
+                  ),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: [
+                      _legendItem(
+                        color: const Color.fromARGB(255, 255, 255, 0),
+                        label: 'agriculture',
+                      ),
+                      _legendItem(
+                        color: const Color.fromARGB(255, 232, 184, 153),
+                        label: 'barren',
+                      ),
+                      _legendItem(
+                        color: const Color.fromARGB(255, 0, 255, 0),
+                        label: 'forest',
+                      ),
+                      _legendItem(
+                        color: const Color.fromARGB(255, 255, 0, 255),
+                        label: 'rangeland',
+                      ),
+                      _legendItem(
+                        color: const Color.fromARGB(255, 0, 0, 0),
+                        label: 'unknown',
+                      ),
+                      _legendItem(
+                        color: const Color.fromARGB(255, 0, 255, 255),
+                        label: 'urban',
+                      ),
+                      _legendItem(
+                        color: const Color.fromARGB(255, 0, 0, 255),
+                        label: 'water',
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                   const Text(
-                    'Statistics',
+                    'Land cover statistics',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -91,33 +163,6 @@ class SegmentationDetailsSheet extends StatelessWidget {
                       ),
                     )
                   else ...[
-                    _DetailRow('Created at', stats.createdAt),
-                    _DetailRow(
-                      'Image size',
-                      '${stats.imageSize.width} x ${stats.imageSize.height}',
-                    ),
-                    _DetailRow(
-                      'Total pixels',
-                      stats.imageSize.total_pixels.toString(),
-                    ),
-                    _DetailRow(
-                      'Unmatched pixels',
-                      stats.imageSize.unmatched_pixels.toString(),
-                    ),
-                    _DetailRow(
-                      'Pixel area',
-                      '${stats.imageSize.pixel_area_m2.toStringAsFixed(2)} m2',
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Land cover classes',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1F3B2D),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                     _ClassRow('Agriculture', stats.classes.agriculture),
                     _ClassRow('Barren', stats.classes.barren),
                     _ClassRow('Forest', stats.classes.forest),
@@ -166,6 +211,27 @@ class _DetailRow extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _legendItem({required Color color, required String label}) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      ),
+      const SizedBox(width: 8),
+      Flexible(
+        child: Text(
+          label,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Colors.grey.shade800, fontSize: 12),
+        ),
+      ),
+    ],
+  );
 }
 
 class _ClassRow extends StatelessWidget {

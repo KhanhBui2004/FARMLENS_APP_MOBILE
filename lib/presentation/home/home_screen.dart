@@ -47,8 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedRegion = 'Selected area: Central farm block';
   LatLng? _selectedLatLng;
   double _calculatedArea = 125.5;
-  double _changePercent = 12.4;
-  double _modelConfidence = 91.0;
   double _cloudCoverage = 18.0;
   Set<Marker> _selectionMarkers = {};
   String? _segmentationId;
@@ -56,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _segmentationImageError;
   String? _sentinelImageUrl;
   String? _sentinelImageError;
+  double _overlayOpacity = 0.5;
 
   CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(16.0544, 108.2022),
@@ -151,10 +150,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final double lng = _selectedLatLng!.longitude;
 
     setState(() {
-      _calculatedArea = 132.8;
-      _changePercent = 8.9;
-      _modelConfidence = 93.6;
-      _cloudCoverage = 14.2;
       _latestStats = null;
     });
     ScaffoldMessenger.of(context).showSnackBar(
@@ -169,8 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
         final SegmentationModel data = result['data'];
         setState(() {
           _calculatedArea = data.pixel_area_m2 * 0.0001;
-          _changePercent = 10.5;
-          _modelConfidence = 95.2;
           _cloudCoverage = data.cloud_cover;
         });
         _segmentationId = data.id;
@@ -512,58 +505,85 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ],
                           ),
-                          child: Column(
-                            children: [
-                              _sentinelImageUrl == null
-                                  ? Text(
-                                      _sentinelImageError ??
-                                          'No sentinel preview available.',
-                                      style: const TextStyle(
-                                        color: Colors.redAccent,
-                                      ),
-                                    )
-                                  : ClipRRect(
+                          child: _sentinelImageUrl == null
+                              ? Text(
+                                  _sentinelImageError ??
+                                      'No sentinel preview available.',
+                                  style: const TextStyle(
+                                    color: Colors.redAccent,
+                                  ),
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
-                                      child: Image.network(
-                                        _sentinelImageUrl!,
-                                        fit: BoxFit.contain,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                              return const Text(
-                                                'Unable to load sentinel image.',
-                                                style: TextStyle(
-                                                  color: Colors.redAccent,
-                                                ),
-                                              );
-                                            },
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Image.network(
+                                            _sentinelImageUrl!,
+                                            fit: BoxFit.contain,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                                  return const Text(
+                                                    'Unable to load sentinel image.',
+                                                    style: TextStyle(
+                                                      color: Colors.redAccent,
+                                                    ),
+                                                  );
+                                                },
+                                          ),
+
+                                          if (_segmentationImageUrl != null)
+                                            Opacity(
+                                              opacity: _overlayOpacity,
+                                              child: Image.network(
+                                                _segmentationImageUrl!,
+                                                fit: BoxFit.contain,
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) {
+                                                      return const SizedBox.shrink();
+                                                    },
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                     ),
-                              SizedBox(height: 12),
-                              _segmentationImageUrl == null
-                                  ? Text(
-                                      _segmentationImageError ??
-                                          'No segmentation preview available.',
-                                      style: const TextStyle(
-                                        color: Colors.redAccent,
+
+                                    const SizedBox(height: 12),
+
+                                    if (_segmentationImageUrl != null) ...[
+                                      Text(
+                                        'Segmentation overlay: ${(_overlayOpacity * 100).round()}%',
                                       ),
-                                    )
-                                  : ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: Image.network(
-                                        _segmentationImageUrl!,
-                                        fit: BoxFit.contain,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return const Text(
-                                            'Unable to load segmentation image.',
-                                            style: TextStyle(
-                                              color: Colors.redAccent,
-                                            ),
-                                          );
+                                      Slider(
+                                        value: _overlayOpacity,
+                                        min: 0,
+                                        max: 1,
+                                        divisions: 100,
+                                        label:
+                                            '${(_overlayOpacity * 100).round()}%',
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _overlayOpacity = value;
+                                          });
                                         },
                                       ),
-                                    ),
-                            ],
-                          ),
+                                    ] else
+                                      Text(
+                                        _segmentationImageError ??
+                                            'No segmentation preview available.',
+                                        style: const TextStyle(
+                                          color: Colors.redAccent,
+                                        ),
+                                      ),
+                                  ],
+                                ),
                         ),
                         Wrap(
                           alignment: WrapAlignment.center,

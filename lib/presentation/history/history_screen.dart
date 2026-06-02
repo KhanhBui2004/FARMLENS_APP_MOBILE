@@ -2,7 +2,6 @@ import 'package:farmlens_app/data/models/analysis/comparison_model.dart';
 import 'package:farmlens_app/data/models/analysis/segmentation_model.dart';
 import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
 import 'package:farmlens_app/data/services/analysis/comparison_service.dart';
-import 'package:farmlens_app/data/services/analysis/overlay_service.dart';
 import 'package:farmlens_app/data/services/analysis/segmentation_service.dart';
 import 'package:farmlens_app/data/services/analysis/statistics_service.dart';
 import 'package:farmlens_app/data/services/auth/auth_service.dart';
@@ -24,7 +23,6 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   final _authService = AuthService();
-  final _overlayService = OverlayService();
   final _segmentationService = SegmentationService();
   final _statisticsService = StatisticsService();
   final _comparisonService = ComparisonService();
@@ -176,7 +174,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     if (shouldDelete == true) {
       await _deleteSegmentationData();
-      await _deleteAllOverlayData();
       await _deleteAllStatistics();
     }
   }
@@ -377,27 +374,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  Future<void> _fetchOverlayData(String analysisId) async {
-    try {
-      final result = await _overlayService.fetchOverlay(analysisId);
-      if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Overlay data fetched successfully!')),
-        );
-        // Handle the fetched overlay data as needed
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Failed to fetch overlay data'),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
-    }
-  }
 
   void _showSegmentationDetails(SegmentationModel item) {
     showModalBottomSheet(
@@ -422,52 +398,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         return ComparisonDetailsSheet(item: item);
       },
     );
-  }
-
-  Future<void> _deleteOverlayData(String analysisId) async {
-    try {
-      final result = await _overlayService.deleteOverlay(analysisId);
-      if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Overlay data deleted successfully!')),
-        );
-        // Optionally refresh the list or update the UI
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Failed to delete overlay data'),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
-    }
-  }
-
-  Future<void> _deleteAllOverlayData() async {
-    try {
-      final result = await _overlayService.deleteAllOverlay();
-      if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('All overlay data deleted successfully!'),
-          ),
-        );
-        // Optionally refresh the list or update the UI
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Failed to delete overlay data'),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
-    }
   }
 
   @override

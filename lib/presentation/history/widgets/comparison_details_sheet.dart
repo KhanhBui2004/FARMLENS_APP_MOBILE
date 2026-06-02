@@ -42,7 +42,6 @@ class ComparisonDetailsSheet extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               _DetailRow('Analysis ID', item.id),
-              _DetailRow('Created at', item.created_at),
               _DetailRow(
                 'Location',
                 '${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
@@ -57,7 +56,7 @@ class ComparisonDetailsSheet extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Timeline',
+                'Change timeline',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,

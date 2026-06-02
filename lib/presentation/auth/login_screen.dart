@@ -32,15 +32,18 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text.trim(),
       );
       if (result['code'] == 200) {
+        debugPrint('Sign in successful!');
+        
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+        ).showSnackBar(const SnackBar(content: Text('Sign in successful!')));
         Navigator.of(context).pushReplacementNamed(AppRoutes.home);
         // Navigate to home screen or dashboard
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'] ?? 'Login failed')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text(result['message'] ?? 'Sign in failed')),
+        // );
+        debugPrint('Sign in failed: ${result['message']}');
       }
     } catch (e) {
       ScaffoldMessenger.of(
@@ -152,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
                     GestureDetector(
                       onTap: _submit,
-                      child: const ButtonCustomWidget(text: 'Login'),
+                      child: const ButtonCustomWidget(text: 'Sign in'),
                     ),
                     const SizedBox(height: 16),
                     Row(
