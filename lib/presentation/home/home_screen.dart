@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:farmlens_app/data/models/analysis/comparison_model.dart';
 import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
 import 'package:farmlens_app/data/services/analysis/comparison_service.dart';
 import 'package:farmlens_app/data/services/analysis/statistics_service.dart';
 import 'package:farmlens_app/presentation/home/widgets/chart_panel.dart';
 import 'package:farmlens_app/presentation/home/widgets/comparison_panel.dart';
+import 'package:farmlens_app/data/services/export/report_export_service.dart';
 import 'package:farmlens_app/utils/router/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,6 +16,8 @@ import '../widgets/map_panel.dart';
 import '../widgets/map_fullscreen_selector.dart';
 import 'widgets/actions_panel.dart';
 import 'widgets/export_section.dart';
+
+import 'package:printing/printing.dart';
 
 import 'package:farmlens_app/data/models/analysis/segmentation_model.dart';
 import 'package:farmlens_app/data/services/analysis/segmentation_service.dart';
@@ -33,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _statService = StatisticsService();
   final ComparisonService _comparisonService = ComparisonService();
+  final _reportExportService = ReportExportService();
 
   ComparisonModel? _comparisonResult;
   String? _comparisonError;
@@ -55,6 +60,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _sentinelImageUrl;
   String? _sentinelImageError;
   double _overlayOpacity = 0.5;
+  bool _isloading = false;
+  String _loadingMessage = 'Processing...';
+
+  DateTime? _segmentationAnalysisDate;
+  LatLng? _segmentationLatLng;
+  LatLng? _changeDetectionLatLng;
 
   CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(16.0544, 108.2022),
@@ -64,11 +75,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _handleMenuAction(String action) {
     switch (action) {
       case 'Logout':
-        // Implement logout logic here
         _authService.logout();
         Navigator.of(context).pushReplacementNamed(AppRoutes.login);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Logged out successfully!')),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'Logged out successfully!',
+          type: ContentType.success,
         );
         break;
       case 'History':
@@ -77,11 +90,41 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'Profile':
         Navigator.of(context).pushNamed(AppRoutes.profile);
         break;
-      // default:
-      //   ScaffoldMessenger.of(
-      //     context,
-      //   ).showSnackBar(SnackBar(content: Text('Selected $action')));
     }
+  }
+
+  void _showLoading(String message) {
+    setState(() {
+      _isloading = true;
+      _loadingMessage = message;
+    });
+  }
+
+  void _hideLoading() {
+    setState(() => _isloading = false);
+  }
+
+  void showAwesomeSnackBar({
+    required BuildContext context,
+    required String title,
+    required String message,
+    required ContentType type,
+  }) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      duration: const Duration(seconds: 3),
+      content: AwesomeSnackbarContent(
+        title: title,
+        message: message,
+        contentType: type,
+      ),
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
   }
 
   Future<void> _selectRegion() async {
@@ -99,12 +142,24 @@ class _HomeScreenState extends State<HomeScreen> {
       _kGooglePlex = CameraPosition(target: selection, zoom: 12);
       _selectedRegion =
           'Selected area: ${selection.latitude.toStringAsFixed(5)}, ${selection.longitude.toStringAsFixed(5)}';
+
       _selectionMarkers = {
         Marker(
           markerId: const MarkerId('selected_region'),
           position: selection,
         ),
       };
+
+      // Clear kết quả cũ vì đã đổi vùng
+      _latestStats = null;
+      _segmentationId = null;
+      _segmentationImageUrl = null;
+      _segmentationImageError = null;
+      _sentinelImageUrl = null;
+      _sentinelImageError = null;
+
+      _comparisonResult = null;
+      _comparisonError = null;
     });
     await _moveCamera(_kGooglePlex);
   }
@@ -151,18 +206,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       _latestStats = null;
+      _segmentationId = null;
+      _segmentationImageUrl = null;
+      _segmentationImageError = null;
+      _sentinelImageUrl = null;
+      _sentinelImageError = null;
+
+      _comparisonResult = null;
+      _comparisonError = null;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Running satellite segmentation pipeline...'),
-      ),
-    );
+
+    _showLoading('Running segmentation...');
+
     try {
       final service = SegmentationService();
       final result = await service.fetchSegmentation(lat, lng, date, 5);
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
         final SegmentationModel data = result['data'];
         setState(() {
+          _segmentationAnalysisDate = _firstDate;
+          _segmentationLatLng = LatLng(lat, lng);
+
           _calculatedArea = data.pixel_area_m2 * 0.0001;
           _cloudCoverage = data.cloud_cover;
         });
@@ -172,19 +239,33 @@ class _HomeScreenState extends State<HomeScreen> {
         if (_segmentationId != null && _segmentationId!.isNotEmpty) {
           await _statistic();
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Segmentation analysis completed!')),
+
+        if (!mounted) return;
+
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'Segmentation completed successfully!',
+          type: ContentType.success,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Analysis failed: ${result['message']}')),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: 'Analysis failed: ${result['message']}',
+          type: ContentType.failure,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error during analysis: $e')));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: 'Error during analysis: $e',
+        type: ContentType.failure,
+      );
       debugPrint('Error during analysis: $e');
+    } finally {
+      _hideLoading();
     }
   }
 
@@ -207,30 +288,56 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         debugPrint('Statistics data: ${data.toString()}');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to fetch statistics: ${result['message']}'),
-          ),
+        if (!mounted) return;
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: 'Failed to fetch statistics: ${result['message']}',
+          type: ContentType.failure,
         );
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Statistics data fetched successfully!')),
+      if (!mounted) return;
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Success',
+        message: 'Statistics data fetched successfully!',
+        type: ContentType.success,
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error fetching statistics: $e')));
+      if (!mounted) return;
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: 'Error fetching statistics: $e',
+        type: ContentType.failure,
+      );
       debugPrint('Error fetching statistics: $e');
     }
   }
 
   Future<void> _runDetection() async {
     if (_selectedLatLng == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a location on the map.')),
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: 'Please select a location on the map.',
+        type: ContentType.failure,
       );
       return;
     }
+
+    if (_firstDate.year == _secondDate.year &&
+        _firstDate.month == _secondDate.month &&
+        _firstDate.day == _secondDate.day) {
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Invalid Date Range',
+        message: 'Please select two different dates for change detection.',
+        type: ContentType.warning,
+      );
+      return;
+    }
+
     final String date1 =
         '${_firstDate.year.toString().padLeft(4, '0')}-${_firstDate.month.toString().padLeft(2, '0')}-${_firstDate.day.toString().padLeft(2, '0')}';
     final String date2 =
@@ -238,11 +345,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final double lat = _selectedLatLng!.latitude;
     final double lng = _selectedLatLng!.longitude;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Running satellite segmentation pipeline...'),
-      ),
-    );
+    _showLoading('Running change detection...');
+
     try {
       setState(() {
         _comparisonResult = null;
@@ -255,37 +359,45 @@ class _HomeScreenState extends State<HomeScreen> {
         date2: date2,
         cloudCover: 20,
       );
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
         setState(() {
           _comparisonResult = result['data'] as ComparisonModel;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Change detection results retrieved successfully!'),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'Change detection completed successfully!',
+          type: ContentType.success,
         );
       } else {
         setState(() {
           _comparisonError = result['message']?.toString();
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Analysis failed: ${result['message']}')),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: 'Analysis failed: ${result['message']}',
+          type: ContentType.failure,
         );
       }
     } catch (e) {
       setState(() {
         _comparisonError = e.toString();
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error during analysis: $e')));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: 'Error during analysis: $e',
+        type: ContentType.failure,
+      );
       debugPrint('Error during analysis: $e');
+    } finally {
+      _hideLoading();
     }
   }
-
-  void _exportReport(String format) => ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: Text('Exporting report as $format')));
 
   void _onMapCreated(GoogleMapController controller) =>
       _controller.complete(controller);
@@ -332,6 +444,63 @@ class _HomeScreenState extends State<HomeScreen> {
       _sentinelImageUrl = normalized;
       _sentinelImageError = null;
     });
+  }
+
+  Future<void> _exportReport(String format) async {
+    if (_latestStats == null) {
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: 'Please run segmentation analysis before exporting report.',
+        type: ContentType.failure,
+      );
+      return;
+    }
+
+    if (format.toLowerCase() != 'pdf') {
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: 'Currently only PDF export is supported.',
+        type: ContentType.failure,
+      );
+      return;
+    }
+
+    try {
+      _showLoading('Generating PDF report...');
+
+      final pdfBytes = await _reportExportService.buildPdfReport(
+        stats: _latestStats!,
+        segmentationId: _segmentationId,
+        analysisDate: _segmentationAnalysisDate ?? _firstDate,
+        lat: _segmentationLatLng?.latitude,
+        lng: _segmentationLatLng?.longitude,
+        cloudCoverage: _cloudCoverage,
+        calculatedArea: _calculatedArea,
+        sentinelImageUrl: _sentinelImageUrl,
+        segmentationImageUrl: _segmentationImageUrl,
+        comparisonResult: _comparisonResult,
+      );
+
+      await Printing.layoutPdf(
+        onLayout: (_) async => pdfBytes,
+        name: 'farmlens_report.pdf',
+      );
+
+      if (!mounted) return;
+    } catch (e) {
+      if (!mounted) return;
+
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: 'Failed to export report: $e',
+        type: ContentType.failure,
+      );
+    } finally {
+      if (mounted) _hideLoading();
+    }
   }
 
   @override
@@ -636,13 +805,41 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 18),
 
                   // Export
-                  _sectionTitle('Report export'),
-                  const SizedBox(height: 10),
-                  ExportSection(onExport: _exportReport),
+                  if (_latestStats != null) ...[
+                    _sectionTitle('Report export'),
+                    const SizedBox(height: 10),
+                    // ExportSection(onExport: _exportReport),
+                    ExportSection(
+                      onExport: _exportReport,
+                      canExport: _latestStats != null,
+                      isExporting: _isloading,
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
+          if (_isloading)
+            Container(
+              color: Colors.black.withValues(alpha: 0.4),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      _loadingMessage,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );

@@ -32,7 +32,13 @@ class SegmentationService {
         'data': SegmentationModel.fromJson(data['data']),
       };
     } on DioException catch (e) {
-      throw Exception('Failed to fetch segmentation data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to fetch segmentation data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -50,14 +56,20 @@ class SegmentationService {
       final List<SegmentationModel> segmentationDatas = (data['data'] as List)
           .map((item) => SegmentationModel.fromJson(item))
           .toList();
-          
+
       return {
         'code': data['code'],
         'message': data['message'],
         'data': segmentationDatas,
       };
     } on DioException catch (e) {
-      throw Exception('Failed to fetch segmentation data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to fetch segmentation data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -75,7 +87,13 @@ class SegmentationService {
       final data = response.data;
       return {'code': data['code'], 'message': data['message']};
     } on DioException catch (e) {
-      throw Exception('Failed to delete segmentation data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to delete segmentation data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -95,7 +113,13 @@ class SegmentationService {
         'count': data['deleted'],
       };
     } on DioException catch (e) {
-      throw Exception('Failed to delete segmentation data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to delete segmentation data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 }

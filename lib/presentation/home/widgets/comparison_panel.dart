@@ -9,31 +9,31 @@ class ComparisonPanel extends StatelessWidget {
 
   List<String> _classOrder() {
     return [
-      'agriculture',
-      'barren',
-      'forest',
-      'rangeland',
-      'unknown',
-      'urban',
-      'water',
+      'Agriculture',
+      'Barren',
+      'Forest',
+      'Rangeland',
+      'Unknown',
+      'Urban',
+      'Water',
     ];
   }
 
   Color _classColor(String key) {
     switch (key) {
-      case 'agriculture':
+      case 'Agriculture':
         return const Color.fromARGB(255, 255, 255, 0);
-      case 'barren':
+      case 'Barren':
         return const Color.fromARGB(255, 232, 184, 153);
-      case 'forest':
+      case 'Forest':
         return const Color.fromARGB(255, 0, 255, 0);
-      case 'rangeland':
+      case 'Rangeland':
         return const Color.fromARGB(255, 255, 0, 255);
-      case 'unknown':
+      case 'Unknown':
         return const Color.fromARGB(255, 0, 0, 0);
-      case 'urban':
+      case 'Urban':
         return const Color.fromARGB(255, 0, 255, 255);
-      case 'water':
+      case 'Water':
         return const Color.fromARGB(255, 0, 0, 255);
       default:
         return Colors.grey;
@@ -42,19 +42,19 @@ class ComparisonPanel extends StatelessWidget {
 
   double _getArea(ComparisonClasses classes, String key) {
     switch (key) {
-      case 'agriculture':
+      case 'Agriculture':
         return classes.agriculture?.area_km2 ?? 0.0;
-      case 'barren':
+      case 'Barren':
         return classes.barren?.area_km2 ?? 0.0;
-      case 'forest':
+      case 'Forest':
         return classes.forest?.area_km2 ?? 0.0;
-      case 'rangeland':
+      case 'Rangeland':
         return classes.rangeland?.area_km2 ?? 0.0;
-      case 'unknown':
+      case 'Unknown':
         return classes.unknown?.area_km2 ?? 0.0;
-      case 'urban':
+      case 'Urban':
         return classes.urban?.area_km2 ?? 0.0;
-      case 'water':
+      case 'Water':
         return classes.water?.area_km2 ?? 0.0;
       default:
         return 0.0;
@@ -69,6 +69,16 @@ class ComparisonPanel extends StatelessWidget {
       return const Color(0xFFC62828);
     }
     return Colors.grey.shade700;
+  }
+
+  String _formatDisplayDate(String date) {
+    if (date.length >= 10) {
+      final parts = date.substring(0, 10).split('-');
+      if (parts.length == 3) {
+        return '${parts[2]}/${parts[1]}/${parts[0]}';
+      }
+    }
+    return date;
   }
 
   Widget _buildComparisonTable(
@@ -102,31 +112,29 @@ class ComparisonPanel extends StatelessWidget {
               Row(
                 children: [
                   const Expanded(
-                    flex: 3,
+                    flex: 2,
                     child: Text(
                       'Class',
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
                   Expanded(
-                    flex: 2,
+                    flex: 3,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        first.date,
+                        _formatDisplayDate(first.date),
                         style: const TextStyle(fontWeight: FontWeight.w700),
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
                   Expanded(
-                    flex: 2,
+                    flex: 3,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        second.date,
+                        _formatDisplayDate(second.date),
                         style: const TextStyle(fontWeight: FontWeight.w700),
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
@@ -152,7 +160,7 @@ class ComparisonPanel extends StatelessWidget {
                   child: Row(
                     children: [
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: Row(
                           children: [
                             Container(
@@ -165,26 +173,23 @@ class ComparisonPanel extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Text(
-                                key,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              child: Text(key, overflow: TextOverflow.ellipsis),
                             ),
                           ],
                         ),
                       ),
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Align(
                           alignment: Alignment.centerRight,
-                          child: Text('${value1.toStringAsFixed(2)}'),
+                          child: Text(value1.toStringAsFixed(2)),
                         ),
                       ),
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Align(
                           alignment: Alignment.centerRight,
-                          child: Text('${value2.toStringAsFixed(2)}'),
+                          child: Text(value2.toStringAsFixed(2)),
                         ),
                       ),
                       Expanded(

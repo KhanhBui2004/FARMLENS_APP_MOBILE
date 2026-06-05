@@ -6,12 +6,14 @@ class SegmentationList extends StatelessWidget {
   final List<SegmentationModel> items;
   final VoidCallback onDeleteAll;
   final ValueChanged<SegmentationModel> onItemTap;
+  final ValueChanged<SegmentationModel> onDeleteItem;
 
   const SegmentationList({
     super.key,
     required this.items,
     required this.onDeleteAll,
     required this.onItemTap,
+    required this.onDeleteItem,
   });
 
   @override
@@ -74,6 +76,7 @@ class SegmentationList extends StatelessWidget {
                 'Location: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
               ],
               onTap: () => onItemTap(item),
+              onDelete: () => onDeleteItem(item),
             );
           },
         ),

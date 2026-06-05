@@ -5,6 +5,7 @@ class HistoryCard extends StatelessWidget {
   final String subtitle;
   final List<String> lines;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
   const HistoryCard({
     super.key,
@@ -12,6 +13,7 @@ class HistoryCard extends StatelessWidget {
     required this.subtitle,
     required this.lines,
     this.onTap,
+    this.onDelete,
   });
 
   @override
@@ -27,13 +29,25 @@ class HistoryCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1F3B2D),
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1F3B2D),
+                      ),
+                    ),
+                  ),
+                  if (onDelete != null)
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Color(0xFFEF5350)),
+                      onPressed: onDelete,
+                    ),
+                ],
               ),
               const SizedBox(height: 4),
               Text(

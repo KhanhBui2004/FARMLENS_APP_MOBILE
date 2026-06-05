@@ -40,7 +40,13 @@ class ComparisonService {
         'data': ComparisonModel.fromJson(data['data']),
       };
     } on DioException catch (e) {
-      throw Exception('Failed to fetch comparison data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to fetch comparison data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -65,7 +71,13 @@ class ComparisonService {
         'data': comparisonDatas,
       };
     } on DioException catch (e) {
-      throw Exception('Failed to fetch comparison data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to fetch comparison data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -82,7 +94,13 @@ class ComparisonService {
 
       return {'code': data['code'], 'message': data['message']};
     } on DioException catch (e) {
-      throw Exception('Failed to delete comparison data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to delete comparison data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -103,7 +121,13 @@ class ComparisonService {
         'count': data['deleted'],
       };
     } on DioException catch (e) {
-      throw Exception('Failed to delete comparison data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to delete comparison data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 }

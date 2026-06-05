@@ -33,7 +33,12 @@ class AuthService {
         'user': user,
       };
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Login failed');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message': e.response?.data['message'] ?? 'Login failed',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -56,7 +61,12 @@ class AuthService {
       final data = response.data;
       return {'code': data['code'], 'message': data['message']};
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Registration failed');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message': e.response?.data['message'] ?? 'Registration failed',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 

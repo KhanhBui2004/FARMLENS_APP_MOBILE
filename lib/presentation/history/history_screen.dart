@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:farmlens_app/data/models/analysis/comparison_model.dart';
 import 'package:farmlens_app/data/models/analysis/segmentation_model.dart';
 import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
@@ -31,6 +32,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<ComparisonModel> _changeDetectionData = [];
   StatisticsModel? _statisticsData;
   bool _isSegmentationTab = true;
+  bool _isLoading = false;
+  String _loadingMessage = 'Processing...';
 
   @override
   void initState() {
@@ -47,78 +50,118 @@ class _HistoryScreenState extends State<HistoryScreen> {
       case 'Logout':
         _authService.logout();
         Navigator.of(context).pushReplacementNamed(AppRoutes.login);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Logged out successfully!')),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'Logged out successfully!',
+          type: ContentType.success,
         );
         break;
       case 'Profile':
         Navigator.of(context).pushNamed(AppRoutes.profile);
         break;
-      // case 'History':
-      //   Navigator.of(context).pushNamed(AppRoutes.history);
-      //   break;
-      // default:
-      //   ScaffoldMessenger.of(
-      //     context,
-      //   ).showSnackBar(SnackBar(content: Text('Selected $action')));
     }
+  }
+
+  void _showLoading([String? message]) {
+    setState(() {
+      _isLoading = true;
+      if (message != null) {
+        _loadingMessage = message;
+      }
+    });
+  }
+
+  void _hideLoading() {
+    setState(() => _isLoading = false);
+  }
+
+  void showAwesomeSnackBar({
+    required BuildContext context,
+    required String title,
+    required String message,
+    required ContentType type,
+  }) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      duration: const Duration(seconds: 3),
+      content: AwesomeSnackbarContent(
+        title: title,
+        message: message,
+        contentType: type,
+      ),
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
   }
 
   Future<void> _fetchSegmentationData() async {
     try {
       final result = await _segmentationService.fetchSegmentationByUser();
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Segmentation data fetched successfully!'),
-          ),
-        );
+        debugPrint('Segmentation data fetched successfully!');
 
         _segmentationData = result['data'];
-
-        setState(() {});
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              result['message'] ?? 'Failed to fetch segmentation data',
-            ),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: result['message'] ?? 'Failed to fetch segmentation data',
+          type: ContentType.failure,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: e.toString(),
+        type: ContentType.failure,
+      );
     }
   }
 
   Future<void> _deleteSegmentationData() async {
     try {
+      _showLoading('Deleting segmentation data...');
+
       final result = await _segmentationService.deleteAllSegmentation();
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Segmentation data deleted successfully!'),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'Segmentation data deleted successfully!',
+          type: ContentType.success,
         );
-        // _fetchSegmentationData(); // Refresh the list after deletion
         setState(() {
           _segmentationData.clear();
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              result['message'] ?? 'Failed to delete segmentation data',
-            ),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: result['message'] ?? 'Failed to delete segmentation data',
+          type: ContentType.failure,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: e.toString(),
+        type: ContentType.failure,
+      );
+    } finally {
+      _hideLoading();
     }
   }
 
@@ -127,28 +170,63 @@ class _HistoryScreenState extends State<HistoryScreen> {
       final result = await _segmentationService.deleteSegmentationById(
         segmentationId,
       );
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Segmentation data deleted successfully!'),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'Segmentation data deleted successfully!',
+          type: ContentType.success,
         );
         setState(() {
           _segmentationData.removeWhere((item) => item.id == segmentationId);
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              result['message'] ?? 'Failed to delete segmentation data',
-            ),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: result['message'] ?? 'Failed to delete segmentation data',
+          type: ContentType.failure,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: e.toString(),
+        type: ContentType.failure,
+      );
+    }
+  }
+
+  Future<void> _confirmDeleteSegmentationById(SegmentationModel item) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete segmentation'),
+          content: Text(
+            'Are you sure you want to delete Analysis ${_segmentationData.indexOf(item) + 1}?\n\nID: ${item.id}?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      await _deleteSegmentationById(item.id);
+      await _deleteStatisticsById(item.id);
     }
   }
 
@@ -184,168 +262,228 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<StatisticsModel?> _fetchStatisticsData(String analysisId) async {
     try {
       final result = await _statisticsService.fetchStatisticsById(analysisId);
+
+      if (!mounted) return null;
+
       if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Statistics data fetched successfully!'),
-          ),
-        );
+        debugPrint('Statistics data fetched successfully!');
         _statisticsData = result['data'];
         return result['data'] as StatisticsModel;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              result['message'] ?? 'Failed to fetch statistics data',
-            ),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: result['message'] ?? 'Failed to fetch statistics data',
+          type: ContentType.failure,
         );
         return null;
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: e.toString(),
+        type: ContentType.failure,
+      );
       return null;
     }
   }
 
   Future<void> _deleteAllStatistics() async {
     try {
+      _showLoading('Deleting statistics data...');
       final result = await _statisticsService.deleteAllStatistics();
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('All statistics data deleted successfully!'),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'All statistics data deleted successfully!',
+          type: ContentType.success,
         );
         setState(() {
           _statisticsData = null;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              result['message'] ?? 'Failed to delete statistics data',
-            ),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: result['message'] ?? 'Failed to delete statistics data',
+          type: ContentType.failure,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: e.toString(),
+        type: ContentType.failure,
+      );
+    } finally {
+      _hideLoading();
     }
   }
 
   Future<void> _deleteStatisticsById(String analysisId) async {
     try {
       final result = await _statisticsService.deleteStatisticsById(analysisId);
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Statistics data deleted successfully!'),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'Statistics data deleted successfully!',
+          type: ContentType.success,
         );
         setState(() {
           _statisticsData = null;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              result['message'] ?? 'Failed to delete statistics data',
-            ),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: result['message'] ?? 'Failed to delete statistics data',
+          type: ContentType.failure,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: e.toString(),
+        type: ContentType.failure,
+      );
     }
   }
 
   Future<void> _fetchChangeDetectionData() async {
     try {
       final result = await _comparisonService.fetchComparisonByUser();
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Change detection data fetched successfully!'),
-          ),
-        );
+        debugPrint('Change detection data fetched successfully!');
+
         _changeDetectionData = result['data'];
         setState(() {});
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              result['message'] ?? 'Failed to fetch change detection data',
-            ),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: result['message'] ?? 'Failed to fetch change detection data',
+          type: ContentType.failure,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: e.toString(),
+        type: ContentType.failure,
+      );
     }
   }
 
   Future<void> _deleteChangeDetectionById(String analysisId) async {
     try {
       final result = await _comparisonService.deleteComparisonById(analysisId);
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Change detection data deleted successfully!'),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'Change detection data deleted successfully!',
+          type: ContentType.success,
         );
         setState(() {
           _changeDetectionData.removeWhere((item) => item.id == analysisId);
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message:
               result['message'] ?? 'Failed to delete change detection data',
-            ),
-          ),
+          type: ContentType.failure,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: e.toString(),
+        type: ContentType.failure,
+      );
     }
   }
 
   Future<void> _deleteAllChangeDetection() async {
     try {
       final result = await _comparisonService.deleteAllComparisons();
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('All change detection data deleted successfully!'),
-          ),
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Success',
+          message: 'All change detection data deleted successfully!',
+          type: ContentType.success,
         );
         setState(() {
           _changeDetectionData.clear();
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message:
               result['message'] ?? 'Failed to delete change detection data',
-            ),
-          ),
+          type: ContentType.failure,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      showAwesomeSnackBar(
+        context: context,
+        title: 'Error',
+        message: e.toString(),
+        type: ContentType.failure,
+      );
+    }
+  }
+
+  Future<void> _confirmDeleteChangeDetectionById(ComparisonModel item) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete change detection'),
+          content: Text(
+            'Are you sure you want to delete Change Detection ${_changeDetectionData.indexOf(item) + 1}?\n\nID: ${item.id}?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      await _deleteChangeDetectionById(item.id);
     }
   }
 
@@ -378,6 +516,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _showSegmentationDetails(SegmentationModel item) {
+    final statisticsFuture = _fetchStatisticsData(item.id);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -385,7 +525,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       builder: (sheetContext) {
         return SegmentationDetailsSheet(
           item: item,
-          statisticsFuture: _fetchStatisticsData(item.id),
+          statisticsFuture: statisticsFuture,
         );
       },
     );
@@ -473,12 +613,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       items: _segmentationData,
                       onDeleteAll: _confirmDeleteAllSegmentation,
                       onItemTap: _showSegmentationDetails,
+                      onDeleteItem: _confirmDeleteSegmentationById,
                     )
                   else
                     ChangeDetectionList(
                       items: _changeDetectionData,
                       onDeleteAll: _confirmDeleteAllChangeDetection,
                       onItemTap: _showComparisonDetails,
+                      onDeleteItem: _confirmDeleteChangeDetectionById,
                     ),
                 ],
               ),

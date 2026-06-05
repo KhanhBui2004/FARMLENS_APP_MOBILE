@@ -29,7 +29,13 @@ class StatisticsService {
         'data': StatisticsModel.fromJson(data['data']),
       };
     } on DioException catch (e) {
-      throw Exception('Failed to fetch statistics data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to fetch statistics data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -51,7 +57,13 @@ class StatisticsService {
         'data': StatisticsModel.fromJson(data['data']),
       };
     } on DioException catch (e) {
-      throw Exception('Failed to fetch statistics data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to fetch statistics data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -68,7 +80,13 @@ class StatisticsService {
 
       return {'code': data['code'], 'message': data['message']};
     } on DioException catch (e) {
-      throw Exception('Failed to delete statistics data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to delete statistics data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 
@@ -89,7 +107,13 @@ class StatisticsService {
         'count': data['deleted'],
       };
     } on DioException catch (e) {
-      throw Exception('Failed to delete statistics data: ${e.message}');
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message':
+            e.response?.data['message'] ?? 'Failed to delete statistics data',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
     }
   }
 }

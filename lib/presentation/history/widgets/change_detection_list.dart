@@ -6,12 +6,14 @@ class ChangeDetectionList extends StatelessWidget {
   final List<ComparisonModel> items;
   final VoidCallback onDeleteAll;
   final ValueChanged<ComparisonModel> onItemTap;
+  final ValueChanged<ComparisonModel> onDeleteItem;
 
   const ChangeDetectionList({
     super.key,
     required this.items,
     required this.onDeleteAll,
     required this.onItemTap,
+    required this.onDeleteItem,
   });
 
   @override
@@ -78,6 +80,7 @@ class ChangeDetectionList extends StatelessWidget {
                 'Location: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
               ],
               onTap: () => onItemTap(item),
+              onDelete: () => onDeleteItem(item),
             );
           },
         ),
