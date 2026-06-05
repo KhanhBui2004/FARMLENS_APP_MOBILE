@@ -30,7 +30,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   List<SegmentationModel> _segmentationData = [];
   List<ComparisonModel> _changeDetectionData = [];
-  StatisticsModel? _statisticsData;
   bool _isSegmentationTab = true;
   bool _isLoading = false;
   String _loadingMessage = 'Processing...';
@@ -267,7 +266,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
       if (result['code'] == 200) {
         debugPrint('Statistics data fetched successfully!');
-        _statisticsData = result['data'];
         return result['data'] as StatisticsModel;
       } else {
         showAwesomeSnackBar(
@@ -303,9 +301,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           message: 'All statistics data deleted successfully!',
           type: ContentType.success,
         );
-        setState(() {
-          _statisticsData = null;
-        });
+        setState(() {});
       } else {
         showAwesomeSnackBar(
           context: context,
@@ -339,9 +335,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           message: 'Statistics data deleted successfully!',
           type: ContentType.success,
         );
-        setState(() {
-          _statisticsData = null;
-        });
+        setState(() {});
       } else {
         showAwesomeSnackBar(
           context: context,
@@ -626,6 +620,41 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
           ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withValues(alpha: 0.25),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x12000000),
+                        blurRadius: 16,
+                        offset: Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      const SizedBox(width: 16),
+                      Text(_loadingMessage),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

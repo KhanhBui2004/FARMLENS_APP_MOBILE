@@ -65,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   DateTime? _segmentationAnalysisDate;
   LatLng? _segmentationLatLng;
-  LatLng? _changeDetectionLatLng;
 
   CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(16.0544, 108.2022),

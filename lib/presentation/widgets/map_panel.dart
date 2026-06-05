@@ -21,27 +21,6 @@ class MapPanel extends StatelessWidget {
     required this.selectionMarkers,
   });
 
-  Widget _legendItem({required Color color, required String label}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.grey.shade800, fontSize: 12),
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -125,7 +104,7 @@ class MapPanel extends StatelessWidget {
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 27, 94, 32).withOpacity(0.2),
+                  color: const Color.fromARGB(255, 27, 94, 32).withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(22),
                 ),
                 child: IconButton(

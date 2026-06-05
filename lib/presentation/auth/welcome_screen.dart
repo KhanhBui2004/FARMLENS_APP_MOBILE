@@ -67,7 +67,7 @@ class WelcomeScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: colorScheme.primary.withOpacity(0.12),
+                          color: colorScheme.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(
@@ -97,7 +97,7 @@ class WelcomeScreen extends StatelessWidget {
                       vertical: 7,
                     ),
                     decoration: BoxDecoration(
-                      color: colorScheme.primary.withOpacity(0.1),
+                      color: colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Text(
@@ -128,7 +128,7 @@ class WelcomeScreen extends StatelessWidget {
                   Text(
                     'Detect agriculture, forest, urban, water and other land cover types using satellite imagery and AI segmentation.',
                     style: TextStyle(
-                      color: Colors.black.withOpacity(0.62),
+                      color: Colors.black.withValues(alpha: 0.62),
                       fontSize: 16,
                       height: 1.5,
                     ),
@@ -152,7 +152,7 @@ class WelcomeScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.12),
+                                color: Colors.black.withValues(alpha: 0.12),
                                 blurRadius: 18,
                                 offset: const Offset(0, 10),
                               ),
@@ -170,7 +170,7 @@ class WelcomeScreen extends StatelessWidget {
                                       begin: Alignment.bottomCenter,
                                       end: Alignment.topCenter,
                                       colors: [
-                                        Colors.black.withOpacity(0.55),
+                                        Colors.black.withValues(alpha: 0.55),
                                         Colors.transparent,
                                       ],
                                     ),
@@ -242,7 +242,9 @@ class WelcomeScreen extends StatelessWidget {
                           style: OutlinedButton.styleFrom(
                             foregroundColor: colorScheme.primary,
                             side: BorderSide(
-                              color: colorScheme.primary.withOpacity(0.55),
+                              color: colorScheme.primary.withValues(
+                                alpha: 0.55,
+                              ),
                               width: 1.3,
                             ),
                             shadowColor: Colors.black.withValues(alpha: 0.15),
@@ -298,10 +300,10 @@ class _FeatureCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colorScheme.primary.withOpacity(0.08)),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.08)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 14,
             offset: const Offset(0, 8),
           ),
@@ -324,7 +326,7 @@ class _FeatureCard extends StatelessWidget {
           Text(
             subtitle,
             style: TextStyle(
-              color: Colors.black.withOpacity(0.55),
+              color: Colors.black.withValues(alpha: 0.55),
               fontSize: 12,
             ),
           ),

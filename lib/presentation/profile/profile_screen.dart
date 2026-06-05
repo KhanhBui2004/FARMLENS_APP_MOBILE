@@ -25,9 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  AuthService _authService = AuthService();
-
-  User? _user;
+  final _authService = AuthService();
 
   @override
   void dispose() {
@@ -96,7 +94,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         if (!mounted) return;
         setState(() {
-          _user = loadedUser;
           _fullNameController.text = loadedUser.fullName;
           _usernameController.text = loadedUser.username;
           _emailController.text = loadedUser.email;
