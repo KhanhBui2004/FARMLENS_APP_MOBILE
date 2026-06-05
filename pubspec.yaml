@@ -39,6 +39,7 @@ dependencies:
   google_maps_flutter_android: ^2.19.8
   dio: ^5.9.2
   shared_preferences: ^2.5.5
+  google_maps_flutter_platform_interface: ^2.15.0
 
 dev_dependencies:
   flutter_test:

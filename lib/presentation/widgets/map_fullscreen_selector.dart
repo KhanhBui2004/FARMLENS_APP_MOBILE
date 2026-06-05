@@ -61,9 +61,11 @@ class _MapFullscreenSelectorState extends State<MapFullscreenSelector> {
       ),
       body: GoogleMap(
         initialCameraPosition: widget.initialCamera,
-        myLocationButtonEnabled: false,
+        myLocationButtonEnabled: true,
+        myLocationEnabled: false,
         zoomControlsEnabled: true,
         mapToolbarEnabled: false,
+        // liteModeEnabled: true,
         onMapCreated: _onMapCreated,
         onTap: _onMapTap,
         markers: marker,

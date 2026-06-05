@@ -3,6 +3,7 @@ import 'package:farmlens_app/presentation/auth/register_screen.dart';
 import 'package:farmlens_app/presentation/auth/welcome_screen.dart';
 import 'package:farmlens_app/presentation/home/home_screen.dart';
 import 'package:farmlens_app/presentation/history/history_screen.dart';
+import 'package:farmlens_app/presentation/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'app_routes.dart';
 
@@ -21,6 +22,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case AppRoutes.history:
         return MaterialPageRoute(builder: (_) => const HistoryScreen());
+      case AppRoutes.profile:
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

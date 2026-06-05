@@ -63,9 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _handleMenuAction(String action) {
     switch (action) {
-      case 'Home':
-        Navigator.of(context).pushNamed(AppRoutes.home);
-        break;
       case 'Logout':
         // Implement logout logic here
         _authService.logout();
@@ -77,10 +74,13 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'History':
         Navigator.of(context).pushNamed(AppRoutes.history);
         break;
-      default:
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Selected $action')));
+      case 'Profile':
+        Navigator.of(context).pushNamed(AppRoutes.profile);
+        break;
+      // default:
+      //   ScaffoldMessenger.of(
+      //     context,
+      //   ).showSnackBar(SnackBar(content: Text('Selected $action')));
     }
   }
 
@@ -427,7 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               SizedBox(height: 8),
                               Text(
-                                'Choose an area, run analysis, visualize results, and export reports in one flow.',
+                                'Select, analyze, visualize, and export in one workflow.',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,

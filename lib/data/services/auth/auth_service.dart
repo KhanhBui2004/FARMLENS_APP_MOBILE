@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:farmlens_app/data/models/auth/user_model.dart';
 import 'package:farmlens_app/data/services/network/api_client.dart';
@@ -25,7 +26,7 @@ class AuthService {
       await prefs.setString('token', token);
       await prefs.setString('refreshToken', refreshToken);
       await prefs.setString('userid', user.id);
-      await prefs.setString('user', user.toJson().toString());
+      await prefs.setString('user', jsonEncode(user.toJson()));
       return {
         'code': response.data['code'],
         'message': response.data['message'],

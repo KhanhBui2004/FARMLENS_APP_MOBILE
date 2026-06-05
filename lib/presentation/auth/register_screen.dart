@@ -34,6 +34,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _submit() async {
     try {
+      if (!_formKey.currentState!.validate()) {
+        return;
+      }
       final response = await authService.register(
         username: _usernameController.text.trim(),
         email: _emailController.text.trim(),
@@ -140,6 +143,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hintText: 'Full name',
                       obscureText: false,
                       keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Full name is required';
+                        }
+                        return null;
+                      },
                       controller: _fullNameController,
                     ),
                     const SizedBox(height: 16),
@@ -147,6 +157,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hintText: 'Email',
                       obscureText: false,
                       keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Email is required';
+                        }
+                        return null;
+                      },
                       controller: _emailController,
                     ),
                     const SizedBox(height: 16),
@@ -154,6 +171,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hintText: 'Username',
                       obscureText: false,
                       keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Username is required';
+                        }
+                        return null;
+                      },
                       controller: _usernameController,
                     ),
                     const SizedBox(height: 16),
@@ -161,6 +185,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hintText: 'Password',
                       obscureText: true,
                       keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Password is required';
+                        }
+                        return null;
+                      },
                       controller: _passwordController,
                     ),
                     const SizedBox(height: 16),
@@ -168,6 +199,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       hintText: 'Confirm password',
                       obscureText: true,
                       keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.done,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please confirm your password';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
                       controller: _confirmPasswordController,
                     ),
                     const SizedBox(height: 24),
@@ -180,12 +221,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
+                            Navigator.of(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => const LoginScreen(),
-                              ),
-                            );
+                            ).pushReplacementNamed(AppRoutes.login);
                           },
                           child: Text(
                             'Sign in',

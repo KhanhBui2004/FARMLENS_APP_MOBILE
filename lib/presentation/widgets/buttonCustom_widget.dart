@@ -1,39 +1,31 @@
 import 'package:flutter/material.dart';
 
-class ButtonCustomWidget extends StatefulWidget {
+class ButtonCustomWidget extends StatelessWidget {
   final VoidCallback? onPressed;
   final String text;
-  const ButtonCustomWidget({super.key, this.onPressed, required this.text});
 
-  @override
-  State<ButtonCustomWidget> createState() => _ButtonCustomWidgetState();
-}
+  const ButtonCustomWidget({super.key, required this.text, this.onPressed});
 
-class _ButtonCustomWidgetState extends State<ButtonCustomWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      height: 64,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 77, 191, 134),
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+      height: 56,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF3F8E5A),
+          foregroundColor: Colors.white,
+          elevation: 4,
+          shadowColor: Colors.black.withValues(alpha: 0.15),
+
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ],
-      ),
-      child: Text(
-        widget.text,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
+
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
+        child: Text(text),
       ),
     );
   }

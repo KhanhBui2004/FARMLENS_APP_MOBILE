@@ -51,13 +51,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
           const SnackBar(content: Text('Logged out successfully!')),
         );
         break;
-      case 'History':
-        Navigator.of(context).pushNamed(AppRoutes.history);
+      case 'Profile':
+        Navigator.of(context).pushNamed(AppRoutes.profile);
         break;
-      default:
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Selected $action')));
+      // case 'History':
+      //   Navigator.of(context).pushNamed(AppRoutes.history);
+      //   break;
+      // default:
+      //   ScaffoldMessenger.of(
+      //     context,
+      //   ).showSnackBar(SnackBar(content: Text('Selected $action')));
     }
   }
 
@@ -373,7 +376,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       await _deleteAllChangeDetection();
     }
   }
-
 
   void _showSegmentationDetails(SegmentationModel item) {
     showModalBottomSheet(

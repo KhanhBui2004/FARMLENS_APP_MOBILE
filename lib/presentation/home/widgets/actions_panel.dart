@@ -129,14 +129,14 @@ class StatsActions extends StatelessWidget {
           children: [
             _featureCard(
               icon: Icons.date_range,
-              title: 'Select First Time',
+              title: 'Select Time',
               description: 'Choose the time for analysis.',
               color: const Color(0xFF2E7D32),
               onTap: onSelectFirstTime,
             ),
             _featureCard(
               icon: Icons.date_range,
-              title: 'Select Second Time',
+              title: 'Time Comparison',
               description: 'Choose the time for comparison.',
               color: const Color(0xFF1565C0),
               onTap: onSelectSecondTime,

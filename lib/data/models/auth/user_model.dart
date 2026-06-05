@@ -16,7 +16,7 @@ class User {
       id: json['id'] ?? '',
       username: json['username'] ?? '',
       email: json['email'] ?? '',
-      fullName: json['full_Name'] ?? '',
+      fullName: json['full_name'] ?? json['fullName'] ?? '',
     );
   }
 
@@ -25,7 +25,7 @@ class User {
       'id': id,
       'username': username,
       'email': email,
-      'fullName': fullName,
+      'full_name': fullName,
     };
   }
 }

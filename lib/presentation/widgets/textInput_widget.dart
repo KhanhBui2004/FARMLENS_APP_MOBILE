@@ -5,13 +5,17 @@ class TextInputWidget extends StatefulWidget {
   final bool obscureText;
   final TextInputType keyboardType;
   final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final TextInputAction? textInputAction;
 
   const TextInputWidget({
     super.key,
     required this.hintText,
     required this.obscureText,
     required this.keyboardType,
+    this.validator,
     this.controller,
+    this.textInputAction,
   });
 
   @override
@@ -41,43 +45,42 @@ class _TextInputWidgetState extends State<TextInputWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 64,
-      alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Color(0xFFF1F1FF),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: isFocused
-              ? const Color.fromARGB(255, 107, 161, 205)
-              : Colors.transparent,
-          width: 2,
+    return TextFormField(
+      controller: widget.controller,
+      keyboardType: widget.keyboardType,
+      obscureText: widget.obscureText,
+      textInputAction: widget.textInputAction,
+      decoration: InputDecoration(
+        labelText: widget.hintText,
+        filled: true,
+        fillColor: Colors.white,
+
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextField(
-        focusNode: _focusNode,
-        controller: widget.controller,
-        obscureText: widget.obscureText,
-        keyboardType: widget.keyboardType,
-        decoration: InputDecoration(
-          hintText: widget.hintText,
-          border: InputBorder.none,
-          hintStyle: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 16,
-            fontStyle: FontStyle.italic,
-          ),
+
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: Color(0xFF3F8E5A), width: 2),
+        ),
+
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
       ),
+      validator: widget.validator,
     );
   }
 }

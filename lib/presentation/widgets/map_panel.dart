@@ -56,6 +56,7 @@ class MapPanel extends StatelessWidget {
               myLocationButtonEnabled: false,
               zoomControlsEnabled: false,
               mapToolbarEnabled: false,
+              liteModeEnabled: true,
               onMapCreated: onMapCreated,
               markers: selectionMarkers,
             ),

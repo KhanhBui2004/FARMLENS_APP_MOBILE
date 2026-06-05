@@ -27,22 +27,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _submit() async {
     try {
+      if (!_formKey.currentState!.validate()) {
+        return;
+      }
       final result = await authService.login(
         _identifierController.text.trim(),
         _passwordController.text.trim(),
       );
       if (result['code'] == 200) {
         debugPrint('Sign in successful!');
-        
+
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Sign in successful!')));
         Navigator.of(context).pushReplacementNamed(AppRoutes.home);
         // Navigate to home screen or dashboard
       } else {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text(result['message'] ?? 'Sign in failed')),
-        // );
         debugPrint('Sign in failed: ${result['message']}');
       }
     } catch (e) {
@@ -118,7 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     Text(
                       'Welcome back! Please login to your account.',
-                      style: TextStyle(fontSize: 16, color: colorScheme.primary),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: colorScheme.primary,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
@@ -126,13 +129,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: 'Username or Email',
                       obscureText: false,
                       keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
                       controller: _identifierController,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Username or email is required';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 16),
                     TextInputWidget(
                       hintText: 'Password',
                       obscureText: true,
                       keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.done,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Password is required';
+                        }
+                        return null;
+                      },
                       controller: _passwordController,
                     ),
                     const SizedBox(height: 12),
@@ -153,10 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    GestureDetector(
-                      onTap: _submit,
-                      child: const ButtonCustomWidget(text: 'Sign in'),
-                    ),
+                    ButtonCustomWidget(text: 'Sign in', onPressed: _submit),
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -165,12 +179,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
+                            Navigator.of(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ),
-                            );
+                            ).pushReplacementNamed(AppRoutes.register);
                           },
                           child: Text(
                             'Sign up',

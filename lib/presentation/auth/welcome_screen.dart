@@ -225,10 +225,10 @@ class WelcomeScreen extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: GestureDetector(
-                          onTap: () =>
+                        child: ButtonCustomWidget(
+                          text: 'Login',
+                          onPressed: () =>
                               Navigator.of(context).pushNamed(AppRoutes.login),
-                          child: const ButtonCustomWidget(text: 'Sign in'),
                         ),
                       ),
 
@@ -245,10 +245,17 @@ class WelcomeScreen extends StatelessWidget {
                               color: colorScheme.primary.withOpacity(0.55),
                               width: 1.3,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 17),
+                            shadowColor: Colors.black.withValues(alpha: 0.15),
+
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(16),
                             ),
+
+                            textStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 17),
                           ),
                           child: const Text(
                             'Create account',
