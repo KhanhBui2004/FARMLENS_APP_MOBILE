@@ -71,8 +71,8 @@ class SegmentationList extends StatelessWidget {
               title: 'Analysis ${index + 1}',
               subtitle: 'Date: ${item.date}',
               lines: [
-                'Cloud cover: ${item.cloud_cover.toStringAsFixed(1)}%',
-                'Area: ${item.pixel_area_m2.toStringAsFixed(2)} m2',
+                'Cloud cover: ${item.cloudCover.toStringAsFixed(1)}%',
+                'Area: ${(item.regionAreaM2 / 1000000).toStringAsFixed(2)} km²',
                 'Location: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
               ],
               onTap: () => onItemTap(item),

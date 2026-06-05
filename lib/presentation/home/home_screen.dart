@@ -100,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _hideLoading() {
+    if (!mounted) return;
     setState(() => _isloading = false);
   }
 
@@ -229,12 +230,12 @@ class _HomeScreenState extends State<HomeScreen> {
           _segmentationAnalysisDate = _firstDate;
           _segmentationLatLng = LatLng(lat, lng);
 
-          _calculatedArea = data.pixel_area_m2 * 0.0001;
-          _cloudCoverage = data.cloud_cover;
+          _calculatedArea = data.regionAreaM2 / 1000000;
+          _cloudCoverage = data.cloudCover;
         });
         _segmentationId = data.id;
-        _setSegmentationImage(data.segmentation_url);
-        _setSentinelImage(data.sentinel_image_url);
+        _setSegmentationImage(data.segmentationUrl);
+        _setSentinelImage(data.sentinelImageUrl);
         if (_segmentationId != null && _segmentationId!.isNotEmpty) {
           await _statistic();
         }
@@ -272,14 +273,14 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_segmentationId == null || _segmentationId!.isEmpty) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Fetching statistics data...')),
-    );
     try {
       // Implement statistics fetching logic here
       final result = await _statService.fetchStatistics(
         analysisId: _segmentationId,
       );
+
+      if (!mounted) return;
+
       if (result['code'] == 200) {
         final StatisticsModel data = result['data'];
         setState(() {
@@ -287,7 +288,6 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         debugPrint('Statistics data: ${data.toString()}');
       } else {
-        if (!mounted) return;
         showAwesomeSnackBar(
           context: context,
           title: 'Error',
@@ -295,13 +295,6 @@ class _HomeScreenState extends State<HomeScreen> {
           type: ContentType.failure,
         );
       }
-      if (!mounted) return;
-      showAwesomeSnackBar(
-        context: context,
-        title: 'Success',
-        message: 'Statistics data fetched successfully!',
-        type: ContentType.success,
-      );
     } catch (e) {
       if (!mounted) return;
       showAwesomeSnackBar(

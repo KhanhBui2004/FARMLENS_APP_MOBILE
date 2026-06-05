@@ -72,6 +72,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _hideLoading() {
+    if (!mounted) return;
     setState(() => _isLoading = false);
   }
 

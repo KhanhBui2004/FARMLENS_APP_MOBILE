@@ -60,7 +60,7 @@ class SegmentationDetailsSheet extends StatelessWidget {
                   ),
                   _DetailRow(
                     'Cloud cover',
-                    '${item.cloud_cover.toStringAsFixed(1)}%',
+                    '${item.cloudCover.toStringAsFixed(1)}%',
                   ),
                   Text(
                     'Sentinel image',
@@ -73,7 +73,7 @@ class SegmentationDetailsSheet extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.network(
-                      '${ApiEndpoints.baseUrl}${item.sentinel_image_url}',
+                      '${ApiEndpoints.baseUrl}${item.sentinelImageUrl}',
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return const Text(
@@ -94,7 +94,7 @@ class SegmentationDetailsSheet extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.network(
-                      '${ApiEndpoints.baseUrl}${item.segmentation_url}',
+                      '${ApiEndpoints.baseUrl}${item.segmentationUrl}',
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return const Text(

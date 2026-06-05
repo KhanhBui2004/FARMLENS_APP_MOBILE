@@ -72,10 +72,10 @@ class ChangeDetectionList extends StatelessWidget {
                 : 'No dates';
             return HistoryCard(
               title: 'Change detection ${index + 1}',
-              subtitle: 'Created: ${item.created_at}',
+              subtitle: 'Created: ${item.createdAt}',
               lines: [
                 'Dates: $dateRange',
-                'Cloud cover: ${item.cloud_cover.toStringAsFixed(1)}%',
+                'Cloud cover: ${item.cloudCover.toStringAsFixed(1)}%',
                 'Timeline items: ${item.timeline.length}',
                 'Location: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
               ],

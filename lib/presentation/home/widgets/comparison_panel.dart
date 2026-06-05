@@ -43,19 +43,19 @@ class ComparisonPanel extends StatelessWidget {
   double _getArea(ComparisonClasses classes, String key) {
     switch (key) {
       case 'Agriculture':
-        return classes.agriculture?.area_km2 ?? 0.0;
+        return classes.agriculture?.areaKm2 ?? 0.0;
       case 'Barren':
-        return classes.barren?.area_km2 ?? 0.0;
+        return classes.barren?.areaKm2 ?? 0.0;
       case 'Forest':
-        return classes.forest?.area_km2 ?? 0.0;
+        return classes.forest?.areaKm2 ?? 0.0;
       case 'Rangeland':
-        return classes.rangeland?.area_km2 ?? 0.0;
+        return classes.rangeland?.areaKm2 ?? 0.0;
       case 'Unknown':
-        return classes.unknown?.area_km2 ?? 0.0;
+        return classes.unknown?.areaKm2 ?? 0.0;
       case 'Urban':
-        return classes.urban?.area_km2 ?? 0.0;
+        return classes.urban?.areaKm2 ?? 0.0;
       case 'Water':
-        return classes.water?.area_km2 ?? 0.0;
+        return classes.water?.areaKm2 ?? 0.0;
       default:
         return 0.0;
     }
@@ -210,11 +210,27 @@ class ComparisonPanel extends StatelessWidget {
                 );
               }),
               const Divider(height: 20),
+
               Align(
                 alignment: Alignment.centerRight,
-                child: Text(
-                  'Unit: km2',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Region area: ${(first.regionAreaM2 / 1000000).toStringAsFixed(2)} km²',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Text(
+                      'Unit: km²',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

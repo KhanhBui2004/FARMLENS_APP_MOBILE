@@ -48,7 +48,7 @@ class ComparisonDetailsSheet extends StatelessWidget {
               ),
               _DetailRow(
                 'Cloud cover',
-                '${item.cloud_cover.toStringAsFixed(1)}%',
+                '${item.cloudCover.toStringAsFixed(1)}%',
               ),
               _DetailRow(
                 'Dates',
@@ -139,6 +139,15 @@ class _TimelineCard extends StatelessWidget {
               color: Color(0xFF1F3B2D),
             ),
           ),
+          const SizedBox(height: 4),
+          Text(
+            'Region area: ${(entry.regionAreaM2 / 1000000).toStringAsFixed(2)} km²',
+            style: const TextStyle(color: Color(0xFF4A6B57), fontSize: 12),
+          ),
+          Text(
+            'Image: ${entry.imageSize['width'] ?? 0} x ${entry.imageSize['height'] ?? 0}',
+            style: const TextStyle(color: Color(0xFF4A6B57), fontSize: 12),
+          ),
           const SizedBox(height: 8),
           _ClassAreaRow('Agriculture', entry.classes.agriculture),
           _ClassAreaRow('Barren', entry.classes.barren),
@@ -179,7 +188,7 @@ class _ClassAreaRow extends StatelessWidget {
             ),
           ),
           Text(
-            '${value!.area_km2.toStringAsFixed(3)} km2',
+            '${value!.areaKm2.toStringAsFixed(3)} km²',
             style: const TextStyle(color: Color(0xFF2F4F3D)),
           ),
         ],

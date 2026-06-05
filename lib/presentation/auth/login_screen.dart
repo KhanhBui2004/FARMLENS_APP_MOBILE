@@ -59,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _hideLoading() {
+    if (!mounted) return;
     setState(() {
       isLoading = false;
     });

@@ -4,6 +4,10 @@ class StatisticsModel {
   final String createdAt;
   final ImageSizeModel imageSize;
   final ClassesModel classes;
+  final int totalPixels;
+  final int unmatchedPixels;
+  final double pixelAreaM2;
+  final double regionAreaM2;
 
   StatisticsModel({
     required this.id,
@@ -11,6 +15,10 @@ class StatisticsModel {
     required this.createdAt,
     required this.imageSize,
     required this.classes,
+    required this.totalPixels,
+    required this.unmatchedPixels,
+    required this.pixelAreaM2,
+    required this.regionAreaM2,
   });
 
   factory StatisticsModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +28,10 @@ class StatisticsModel {
       createdAt: json['created_at'],
       imageSize: ImageSizeModel.fromJson(json['image_size'] ?? {}),
       classes: ClassesModel.fromJson(json['classes'] ?? {}),
+      totalPixels: (json['total_pixels'] as num?)?.toInt() ?? 0,
+      unmatchedPixels: (json['unmatched_pixels'] as num?)?.toInt() ?? 0,
+      pixelAreaM2: (json['pixel_area_m2'] as num?)?.toDouble() ?? 0.0,
+      regionAreaM2: (json['region_area_m2'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
@@ -27,25 +39,16 @@ class StatisticsModel {
 class ImageSizeModel {
   final int width;
   final int height;
-  final int total_pixels;
-  final int unmatched_pixels;
-  final double pixel_area_m2;
 
   ImageSizeModel({
     required this.width,
     required this.height,
-    required this.total_pixels,
-    required this.unmatched_pixels,
-    required this.pixel_area_m2,
   });
 
   factory ImageSizeModel.fromJson(Map<String, dynamic> json) {
     return ImageSizeModel(
       width: (json['width'] as num?)?.toInt() ?? 0,
       height: (json['height'] as num?)?.toInt() ?? 0,
-      total_pixels: (json['total_pixels'] as num?)?.toInt() ?? 0,
-      unmatched_pixels: (json['unmatched_pixels'] as num?)?.toInt() ?? 0,
-      pixel_area_m2: (json['pixel_area_m2'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

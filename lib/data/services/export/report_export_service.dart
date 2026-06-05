@@ -229,19 +229,19 @@ class ReportExportService {
   double _getComparisonArea(ComparisonClasses classes, String key) {
     switch (key) {
       case 'agriculture':
-        return classes.agriculture?.area_km2 ?? 0.0;
+        return classes.agriculture?.areaKm2 ?? 0.0;
       case 'barren':
-        return classes.barren?.area_km2 ?? 0.0;
+        return classes.barren?.areaKm2 ?? 0.0;
       case 'forest':
-        return classes.forest?.area_km2 ?? 0.0;
+        return classes.forest?.areaKm2 ?? 0.0;
       case 'rangeland':
-        return classes.rangeland?.area_km2 ?? 0.0;
+        return classes.rangeland?.areaKm2 ?? 0.0;
       case 'unknown':
-        return classes.unknown?.area_km2 ?? 0.0;
+        return classes.unknown?.areaKm2 ?? 0.0;
       case 'urban':
-        return classes.urban?.area_km2 ?? 0.0;
+        return classes.urban?.areaKm2 ?? 0.0;
       case 'water':
-        return classes.water?.area_km2 ?? 0.0;
+        return classes.water?.areaKm2 ?? 0.0;
       default:
         return 0.0;
     }

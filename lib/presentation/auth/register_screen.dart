@@ -43,6 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _hideLoading() {
+    if (!mounted) return;
     setState(() {
       isLoading = false;
     });
