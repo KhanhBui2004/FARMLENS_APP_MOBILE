@@ -55,7 +55,7 @@ class AuthService {
           'username': username,
           'email': email,
           'password': password,
-          'full_Name': fullName,
+          'full_name': fullName,
         },
       );
       final data = response.data;

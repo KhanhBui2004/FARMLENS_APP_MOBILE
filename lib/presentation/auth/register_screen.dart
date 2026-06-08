@@ -6,14 +6,17 @@ import 'package:farmlens_app/presentation/widgets/buttonCustom_widget.dart';
 import 'package:farmlens_app/presentation/widgets/textInput_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  // const RegisterScreen({super.key});
+  final AuthService? authService;
+
+  const RegisterScreen({super.key, this.authService});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final authService = AuthService();
+  // final authService = AuthService();
 
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
@@ -24,6 +27,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool isLoading = false;
   String loadingMessage = 'Processing...';
+
+  late final AuthService authService;
+
+  @override
+  void initState() {
+    super.initState();
+    authService = widget.authService ?? AuthService();
+  }
 
   @override
   void dispose() {

@@ -16,17 +16,33 @@ import 'package:farmlens_app/utils/router/app_routes.dart';
 import 'package:flutter/material.dart';
 
 class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({super.key});
+  // const HistoryScreen({super.key});
+  final AuthService? authService;
+  final SegmentationService? segmentationService;
+  final StatisticsService? statisticsService;
+  final ComparisonService? comparisonService;
+
+  const HistoryScreen({
+    super.key,
+    this.authService,
+    this.segmentationService,
+    this.statisticsService,
+    this.comparisonService,
+  });
 
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  final _authService = AuthService();
-  final _segmentationService = SegmentationService();
-  final _statisticsService = StatisticsService();
-  final _comparisonService = ComparisonService();
+  // final _authService = AuthService();
+  // final _segmentationService = SegmentationService();
+  // final _statisticsService = StatisticsService();
+  // final _comparisonService = ComparisonService();
+  late final AuthService _authService;
+  late final SegmentationService _segmentationService;
+  late final StatisticsService _statisticsService;
+  late final ComparisonService _comparisonService;
 
   List<SegmentationModel> _segmentationData = [];
   List<ComparisonModel> _changeDetectionData = [];
@@ -37,6 +53,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
+
+    _authService = widget.authService ?? AuthService();
+    _segmentationService = widget.segmentationService ?? SegmentationService();
+    _statisticsService = widget.statisticsService ?? StatisticsService();
+    _comparisonService = widget.comparisonService ?? ComparisonService();
+
     _fetchSegmentationData();
     _fetchChangeDetectionData();
   }
@@ -107,8 +129,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
       if (result['code'] == 200) {
         debugPrint('Segmentation data fetched successfully!');
-
-        _segmentationData = result['data'];
+        setState(() {
+          _segmentationData = result['data'];
+        });
       } else {
         showAwesomeSnackBar(
           context: context,

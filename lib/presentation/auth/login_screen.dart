@@ -6,20 +6,30 @@ import 'package:farmlens_app/presentation/widgets/textInput_widget.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  // const LoginScreen({super.key});
+  final AuthService? authService;
+
+  const LoginScreen({super.key, this.authService});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final authService = AuthService();
+  // final authService = AuthService();
+  late final AuthService authService;
   final _formKey = GlobalKey<FormState>();
   final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool isLoading = false;
   String loadingMessage = 'Processing...';
+
+  @override
+  void initState() {
+    super.initState();
+    authService = widget.authService ?? AuthService();
+  }
 
   @override
   void dispose() {
