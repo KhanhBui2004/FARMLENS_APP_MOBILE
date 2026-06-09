@@ -22,19 +22,19 @@ class ComparisonPanel extends StatelessWidget {
   Color _classColor(String key) {
     switch (key) {
       case 'Agriculture':
-        return const Color.fromARGB(255, 255, 255, 0);
+        return const Color.fromARGB(255, 255, 255, 100);
       case 'Barren':
-        return const Color.fromARGB(255, 232, 184, 153);
+        return const Color.fromARGB(255, 210, 180, 140);
       case 'Forest':
-        return const Color.fromARGB(255, 0, 255, 0);
+        return const Color.fromARGB(255, 0, 100, 0);
       case 'Rangeland':
-        return const Color.fromARGB(255, 255, 0, 255);
+        return const Color.fromARGB(255, 124, 252, 0);
       case 'Unknown':
         return const Color.fromARGB(255, 0, 0, 0);
       case 'Urban':
-        return const Color.fromARGB(255, 0, 255, 255);
+        return const Color.fromARGB(255, 178, 34, 34);
       case 'Water':
-        return const Color.fromARGB(255, 0, 0, 255);
+        return const Color.fromARGB(255, 65, 105, 225);
       default:
         return Colors.grey;
     }

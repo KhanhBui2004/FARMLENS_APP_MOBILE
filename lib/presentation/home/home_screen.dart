@@ -588,7 +588,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               SizedBox(height: 8),
                               Text(
-                                'Select, analyze, visualize, and export in one workflow.',
+                                'Satellite Farm Analytics',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
@@ -752,19 +752,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           runSpacing: 8,
                           children: [
                             _legendItem(
-                              color: const Color.fromARGB(255, 255, 255, 0),
+                              color: const Color.fromARGB(255, 255, 255, 100),
                               label: 'agriculture',
                             ),
                             _legendItem(
-                              color: const Color.fromARGB(255, 232, 184, 153),
+                              color: const Color.fromARGB(255, 210, 180, 140),
                               label: 'barren',
                             ),
                             _legendItem(
-                              color: const Color.fromARGB(255, 0, 255, 0),
+                              color: const Color.fromARGB(255, 0, 100, 0),
                               label: 'forest',
                             ),
                             _legendItem(
-                              color: const Color.fromARGB(255, 255, 0, 255),
+                              color: const Color.fromARGB(255, 124, 252, 0),
                               label: 'rangeland',
                             ),
                             _legendItem(
@@ -772,11 +772,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               label: 'unknown',
                             ),
                             _legendItem(
-                              color: const Color.fromARGB(255, 0, 255, 255),
+                              color: const Color.fromARGB(255, 178, 34, 34),
                               label: 'urban',
                             ),
                             _legendItem(
-                              color: const Color.fromARGB(255, 0, 0, 255),
+                              color: const Color.fromARGB(255, 65, 105, 225),
                               label: 'water',
                             ),
                           ],
