@@ -70,6 +70,46 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>> updateProfile({
+    String? username,
+    String? email,
+    String? fullName,
+    String? password,
+  }) async {
+    try {
+      Map<String, dynamic> body = {};
+      if (username != null) body['username'] = username;
+      if (email != null) body['email'] = email;
+      if (fullName != null) body['full_name'] = fullName;
+      if (password != null) body['password'] = password;
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await _dio.patch(
+        ApiEndpoints.profile,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        data: body,
+      );
+
+      final data = response.data;
+
+      if (data['code'] == 200) {
+        final updatedUser = User.fromJson(data['user']);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user', jsonEncode(updatedUser.toJson()));
+      }
+      return {'code': data['code'], 'message': data['message']};
+    } on DioException catch (e) {
+      return {
+        'code': e.response?.statusCode ?? 500,
+        'message': e.response?.data['message'] ?? 'Profile update failed',
+      };
+    } catch (e) {
+      return {'code': 500, 'message': e.toString()};
+    }
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();

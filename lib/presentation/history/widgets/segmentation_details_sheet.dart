@@ -272,7 +272,7 @@ class _ClassRow extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Text(
-              '${stats!.area_km2.toStringAsFixed(3)} km2',
+              '${stats!.area_km2.toStringAsFixed(3)} km²',
               style: const TextStyle(color: Color(0xFF2F4F3D)),
             ),
           ],

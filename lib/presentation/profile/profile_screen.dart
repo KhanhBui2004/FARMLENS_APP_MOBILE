@@ -104,6 +104,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _updateProfile() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        final result = await _authService.updateProfile(
+          fullName: _fullNameController.text.trim(),
+          username: _usernameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _newPasswordController.text.trim().isEmpty
+              ? null
+              : _newPasswordController.text.trim(),
+        );
+
+        if (!mounted) return;
+
+        if (result['code'] == 200) {
+          showAwesomeSnackBar(
+            context: context,
+            title: 'Success',
+            message: 'Profile updated successfully!',
+            type: ContentType.success,
+          );
+
+          await _loadUserData();
+
+          if (!mounted) return;
+
+          setState(() {});
+        } else {
+          showAwesomeSnackBar(
+            context: context,
+            title: 'Error',
+            message: result['message'] ?? 'Failed to update profile',
+            type: ContentType.failure,
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+
+        showAwesomeSnackBar(
+          context: context,
+          title: 'Error',
+          message: 'Unexpected error occurred',
+          type: ContentType.failure,
+        );
+        debugPrint('Error updating profile: $e');
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -251,9 +300,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 24),
                       ButtonCustomWidget(
                         onPressed: () {
-                          if (_formKey.currentState?.validate() ?? false) {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          }
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          _updateProfile();
                         },
                         text: 'Save Changes',
                       ),

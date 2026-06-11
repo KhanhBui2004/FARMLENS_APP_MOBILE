@@ -220,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final service = SegmentationService();
-      final result = await service.fetchSegmentation(lat, lng, date, 5);
+      final result = await service.fetchSegmentation(lat, lng, date, 20);
 
       if (!mounted) return;
 

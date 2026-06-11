@@ -116,21 +116,35 @@ class ChartPanel extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: slices
-                    .where((slice) => slice.percentage > 0)
-                    .map(
-                      (slice) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: _legendItem(
-                          color: slice.color,
-                          label:
-                              '${slice.label} (${slice.percentage.toStringAsFixed(1)}%)',
-                        ),
-                      ),
-                    )
-                    .toList(),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: slices
+                        .where((slice) => slice.percentage > 0)
+                        .map(
+                          (slice) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: _legendItem(
+                              color: slice.color,
+                              label:
+                                  '${slice.label} (${slice.percentage.toStringAsFixed(1)}%)',
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+
+                  Text(
+                    'Total area: ${((latestStats!.regionAreaM2 / 1000000.0).toStringAsFixed(2))} km²',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
