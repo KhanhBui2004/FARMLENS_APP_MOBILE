@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:farmlens_app/data/models/analysis/comparison_model.dart';
+import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
 
-class StatsPanel extends StatefulWidget {
-  final double area;
-  final double changePercent;
-  final double confidence;
+class StatsPanel extends StatelessWidget {
+  final StatisticsModel? stats;
+  final ComparisonModel? comparison;
   final double cloud;
 
   const StatsPanel({
     super.key,
-    required this.area,
-    required this.changePercent,
-    required this.confidence,
+    required this.stats,
+    required this.comparison,
     required this.cloud,
   });
-
-  @override
-  State<StatsPanel> createState() => _StatsPanelState();
-}
-
-class _StatsPanelState extends State<StatsPanel> {
 
   Widget _statCard({
     required String title,
@@ -80,6 +74,17 @@ class _StatsPanelState extends State<StatsPanel> {
 
   @override
   Widget build(BuildContext context) {
+    if (stats == null) return const SizedBox.shrink();
+
+    final agri = stats!.classes.agriculture;
+    final cropAreaHa = ((agri?.area_km2 ?? 0) * 100).toStringAsFixed(1);
+
+    final change = comparison?.farmlandTracking?.agricultureRelativeChangePercentage ?? 0.0;
+    final changeText =
+        '${change >= 0 ? '+' : ''}${change.toStringAsFixed(1)}%';
+
+    final cropPercentage = agri?.percentage ?? 0.0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -92,17 +97,17 @@ class _StatsPanelState extends State<StatsPanel> {
           children: [
             _statCard(
               title: 'Crop area',
-              value: '${widget.area.toStringAsFixed(1)} ha',
+              value: '$cropAreaHa ha',
               icon: Icons.square_foot,
               color: const Color(0xFF2E7D32),
-              caption: 'current',
+              caption: '${cropPercentage.toStringAsFixed(1)}%',
             ),
             const SizedBox(width: 12),
             _statCard(
               title: 'Change vs. last period',
-              value: '+${widget.changePercent.toStringAsFixed(1)}%',
+              value: changeText,
               icon: Icons.trending_up,
-              color: const Color(0xFF1565C0),
+              color: change < 0 ? const Color(0xFFC62828) : const Color(0xFF1565C0),
               caption: 'trend',
             ),
           ],
@@ -111,16 +116,16 @@ class _StatsPanelState extends State<StatsPanel> {
         Row(
           children: [
             _statCard(
-              title: 'Model confidence',
-              value: '${widget.confidence.toStringAsFixed(1)}%',
-              icon: Icons.verified,
+              title: 'Farmland share',
+              value: '${cropPercentage.toStringAsFixed(1)}%',
+              icon: Icons.agriculture,
               color: const Color(0xFFF57C00),
-              caption: 'U-Net',
+              caption: 'current',
             ),
             const SizedBox(width: 12),
             _statCard(
               title: 'Cloud coverage',
-              value: '${widget.cloud.toStringAsFixed(1)}%',
+              value: '${cloud.toStringAsFixed(1)}%',
               icon: Icons.cloud,
               color: const Color(0xFF5E35B1),
               caption: 'image quality',

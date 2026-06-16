@@ -16,7 +16,6 @@ import 'package:farmlens_app/utils/router/app_routes.dart';
 import 'package:flutter/material.dart';
 
 class HistoryScreen extends StatefulWidget {
-  // const HistoryScreen({super.key});
   final AuthService? authService;
   final SegmentationService? segmentationService;
   final StatisticsService? statisticsService;
@@ -35,10 +34,6 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  // final _authService = AuthService();
-  // final _segmentationService = SegmentationService();
-  // final _statisticsService = StatisticsService();
-  // final _comparisonService = ComparisonService();
   late final AuthService _authService;
   late final SegmentationService _segmentationService;
   late final StatisticsService _statisticsService;
@@ -603,45 +598,51 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
           SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: HomeHeader(
-                      onMenuSelected: _handleMenuAction,
-                      title: 'Farmlens History',
-                      subtitle:
-                          'Monitor changes in your farm over time with precision and ease.',
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: HomeHeader(
+                    onMenuSelected: _handleMenuAction,
+                    title: 'Farmlens History',
+                    subtitle:
+                        'Monitor changes in your farm over time with precision and ease.',
+                  ),
+                ),
+                const SizedBox(height: 18),
+                HistoryTabSelector(
+                  isSegmentationTab: _isSegmentationTab,
+                  onSegmentationTap: () =>
+                      setState(() => _isSegmentationTab = true),
+                  onChangeDetectionTap: () =>
+                      setState(() => _isSegmentationTab = false),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_isSegmentationTab)
+                          SegmentationList(
+                            items: _segmentationData,
+                            onDeleteAll: _confirmDeleteAllSegmentation,
+                            onItemTap: _showSegmentationDetails,
+                            onDeleteItem: _confirmDeleteSegmentationById,
+                          )
+                        else
+                          ChangeDetectionList(
+                            items: _changeDetectionData,
+                            onDeleteAll: _confirmDeleteAllChangeDetection,
+                            onItemTap: _showComparisonDetails,
+                            onDeleteItem: _confirmDeleteChangeDetectionById,
+                          ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 18),
-                  HistoryTabSelector(
-                    isSegmentationTab: _isSegmentationTab,
-                    onSegmentationTap: () =>
-                        setState(() => _isSegmentationTab = true),
-                    onChangeDetectionTap: () =>
-                        setState(() => _isSegmentationTab = false),
-                  ),
-                  const SizedBox(height: 16),
-                  if (_isSegmentationTab)
-                    SegmentationList(
-                      items: _segmentationData,
-                      onDeleteAll: _confirmDeleteAllSegmentation,
-                      onItemTap: _showSegmentationDetails,
-                      onDeleteItem: _confirmDeleteSegmentationById,
-                    )
-                  else
-                    ChangeDetectionList(
-                      items: _changeDetectionData,
-                      onDeleteAll: _confirmDeleteAllChangeDetection,
-                      onItemTap: _showComparisonDetails,
-                      onDeleteItem: _confirmDeleteChangeDetectionById,
-                    ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           if (_isLoading)

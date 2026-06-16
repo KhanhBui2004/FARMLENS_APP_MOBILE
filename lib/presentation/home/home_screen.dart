@@ -8,6 +8,7 @@ import 'package:farmlens_app/data/services/analysis/statistics_service.dart';
 import 'package:farmlens_app/presentation/home/widgets/chart_panel.dart';
 import 'package:farmlens_app/presentation/home/widgets/comparison_panel.dart';
 import 'package:farmlens_app/data/services/export/report_export_service.dart';
+import 'package:farmlens_app/presentation/home/widgets/stats_panel.dart';
 import 'package:farmlens_app/utils/router/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -23,6 +24,7 @@ import 'package:farmlens_app/data/models/analysis/segmentation_model.dart';
 import 'package:farmlens_app/data/services/analysis/segmentation_service.dart';
 import 'package:farmlens_app/data/services/auth/auth_service.dart';
 import 'package:farmlens_app/utils/constant/api_endpoints.dart';
+import 'package:farmlens_app/presentation/widgets/recommendation_panel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -538,277 +540,331 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: HomeHeader(
-                      onMenuSelected: _handleMenuAction,
-                      title: 'FarmLens Dashboard',
-                      subtitle:
-                          'Satellite monitoring, U-Net segmentation and crop analytics',
-                    ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: HomeHeader(
+                    onMenuSelected: _handleMenuAction,
+                    title: 'FarmLens Dashboard',
+                    subtitle:
+                        'Satellite monitoring, U-Net segmentation and crop analytics',
                   ),
-                  const SizedBox(height: 12),
-                  // Overview card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
-                      ),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x26000000),
-                          blurRadius: 20,
-                          offset: Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Row(
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'Operational overview',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Satellite Farm Analytics',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1.25,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Container(
-                          width: 74,
-                          height: 74,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(22),
-                          ),
-                          child: const Icon(
-                            Icons.satellite_alt,
-                            color: Colors.white,
-                            size: 38,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 18),
+                        // Header
 
-                  // Map panel
-                  _sectionTitle('Satellite map and analysis area'),
-                  const SizedBox(height: 10),
-                  MapPanel(
-                    initialCamera: _kGooglePlex,
-                    mapType: _currentMapType,
-                    onMapCreated: _onMapCreated,
-                    onSelectRegion: _selectRegion,
-                    // onRunAnalysis: _runAnalysis,
-                    onToggleMapType: () => setState(
-                      () => _currentMapType = _currentMapType == MapType.hybrid
-                          ? MapType.normal
-                          : MapType.hybrid,
-                    ),
-                    selectedRegionLabel: _selectedRegion,
-                    selectionMarkers: _selectionMarkers,
-                  ),
-                  const SizedBox(height: 18),
-
-                  // Quick actions + stats
-                  StatsActions(
-                    onSelectFirstTime: _selectFirstTime,
-                    onSelectSecondTime: _selectSecondTime,
-                    onRunAnalysis: _runAnalysis,
-                    onChangeDetection: _runDetection,
-                  ),
-                  const SizedBox(height: 18),
-
-                  if (_segmentationImageUrl != null ||
-                      _segmentationImageError != null) ...[
-                    _sectionTitle('Segmentation preview'),
-                    const SizedBox(height: 10),
-                    Column(
-                      children: [
+                        // Overview card
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+                            ),
+                            borderRadius: BorderRadius.circular(24),
                             boxShadow: const [
                               BoxShadow(
-                                color: Color(0x1A000000),
-                                blurRadius: 16,
-                                offset: Offset(0, 8),
+                                color: Color(0x26000000),
+                                blurRadius: 20,
+                                offset: Offset(0, 10),
                               ),
                             ],
                           ),
-                          child: _sentinelImageUrl == null
-                              ? Text(
-                                  _sentinelImageError ??
-                                      'No sentinel preview available.',
-                                  style: const TextStyle(
-                                    color: Colors.redAccent,
-                                  ),
-                                )
-                              : Column(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: Stack(
-                                        alignment: Alignment.center,
+                                  children: const [
+                                    Text(
+                                      'Operational overview',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'Satellite Farm Analytics',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1.25,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Container(
+                                width: 74,
+                                height: 74,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.14),
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: const Icon(
+                                  Icons.satellite_alt,
+                                  color: Colors.white,
+                                  size: 38,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+
+                        // Map panel
+                        _sectionTitle('Satellite map and analysis area'),
+                        const SizedBox(height: 10),
+                        MapPanel(
+                          initialCamera: _kGooglePlex,
+                          mapType: _currentMapType,
+                          onMapCreated: _onMapCreated,
+                          onSelectRegion: _selectRegion,
+                          // onRunAnalysis: _runAnalysis,
+                          onToggleMapType: () => setState(
+                            () => _currentMapType =
+                                _currentMapType == MapType.hybrid
+                                ? MapType.normal
+                                : MapType.hybrid,
+                          ),
+                          selectedRegionLabel: _selectedRegion,
+                          selectionMarkers: _selectionMarkers,
+                        ),
+                        const SizedBox(height: 18),
+
+                        // Quick actions + stats
+                        StatsActions(
+                          onSelectFirstTime: _selectFirstTime,
+                          onSelectSecondTime: _selectSecondTime,
+                          onRunAnalysis: _runAnalysis,
+                          onChangeDetection: _runDetection,
+                        ),
+                        const SizedBox(height: 18),
+
+                        if (_latestStats != null) ...[
+                          StatsPanel(
+                            stats: _latestStats,
+                            comparison: _comparisonResult,
+                            cloud: _cloudCoverage,
+                          ),
+                          const SizedBox(height: 18),
+                        ],
+
+                        if (_segmentationImageUrl != null ||
+                            _segmentationImageError != null) ...[
+                          _sectionTitle('Segmentation preview'),
+                          const SizedBox(height: 10),
+                          Column(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0x1A000000),
+                                      blurRadius: 16,
+                                      offset: Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: _sentinelImageUrl == null
+                                    ? Text(
+                                        _sentinelImageError ??
+                                            'No sentinel preview available.',
+                                        style: const TextStyle(
+                                          color: Colors.redAccent,
+                                        ),
+                                      )
+                                    : Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Image.network(
-                                            _sentinelImageUrl!,
-                                            fit: BoxFit.contain,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return const Text(
-                                                    'Unable to load sentinel image.',
-                                                    style: TextStyle(
-                                                      color: Colors.redAccent,
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Image.network(
+                                                  _sentinelImageUrl!,
+                                                  fit: BoxFit.contain,
+                                                  errorBuilder:
+                                                      (
+                                                        context,
+                                                        error,
+                                                        stackTrace,
+                                                      ) {
+                                                        return const Text(
+                                                          'Unable to load sentinel image.',
+                                                          style: TextStyle(
+                                                            color: Colors
+                                                                .redAccent,
+                                                          ),
+                                                        );
+                                                      },
+                                                ),
+
+                                                if (_segmentationImageUrl !=
+                                                    null)
+                                                  Opacity(
+                                                    opacity: _overlayOpacity,
+                                                    child: Image.network(
+                                                      _segmentationImageUrl!,
+                                                      fit: BoxFit.contain,
+                                                      errorBuilder:
+                                                          (
+                                                            context,
+                                                            error,
+                                                            stackTrace,
+                                                          ) {
+                                                            return const SizedBox.shrink();
+                                                          },
                                                     ),
-                                                  );
-                                                },
+                                                  ),
+                                              ],
+                                            ),
                                           ),
 
-                                          if (_segmentationImageUrl != null)
-                                            Opacity(
-                                              opacity: _overlayOpacity,
-                                              child: Image.network(
-                                                _segmentationImageUrl!,
-                                                fit: BoxFit.contain,
-                                                errorBuilder:
-                                                    (
-                                                      context,
-                                                      error,
-                                                      stackTrace,
-                                                    ) {
-                                                      return const SizedBox.shrink();
-                                                    },
+                                          const SizedBox(height: 12),
+
+                                          if (_segmentationImageUrl !=
+                                              null) ...[
+                                            Text(
+                                              'Segmentation overlay: ${(_overlayOpacity * 100).round()}%',
+                                            ),
+                                            Slider(
+                                              value: _overlayOpacity,
+                                              min: 0,
+                                              max: 1,
+                                              divisions: 100,
+                                              label:
+                                                  '${(_overlayOpacity * 100).round()}%',
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _overlayOpacity = value;
+                                                });
+                                              },
+                                            ),
+                                          ] else
+                                            Text(
+                                              _segmentationImageError ??
+                                                  'No segmentation preview available.',
+                                              style: const TextStyle(
+                                                color: Colors.redAccent,
                                               ),
                                             ),
                                         ],
                                       ),
+                              ),
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 12,
+                                runSpacing: 8,
+                                children: [
+                                  _legendItem(
+                                    color: const Color.fromARGB(
+                                      255,
+                                      255,
+                                      255,
+                                      100,
                                     ),
+                                    label: 'agriculture',
+                                  ),
+                                  _legendItem(
+                                    color: const Color.fromARGB(
+                                      255,
+                                      210,
+                                      180,
+                                      140,
+                                    ),
+                                    label: 'barren',
+                                  ),
+                                  _legendItem(
+                                    color: const Color.fromARGB(255, 0, 100, 0),
+                                    label: 'forest',
+                                  ),
+                                  _legendItem(
+                                    color: const Color.fromARGB(
+                                      255,
+                                      124,
+                                      252,
+                                      0,
+                                    ),
+                                    label: 'rangeland',
+                                  ),
+                                  _legendItem(
+                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    label: 'unknown',
+                                  ),
+                                  _legendItem(
+                                    color: const Color.fromARGB(
+                                      255,
+                                      178,
+                                      34,
+                                      34,
+                                    ),
+                                    label: 'urban',
+                                  ),
+                                  _legendItem(
+                                    color: const Color.fromARGB(
+                                      255,
+                                      65,
+                                      105,
+                                      225,
+                                    ),
+                                    label: 'water',
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 18),
 
-                                    const SizedBox(height: 12),
+                              ChartPanel(latestStats: _latestStats),
+                            ],
+                          ),
 
-                                    if (_segmentationImageUrl != null) ...[
-                                      Text(
-                                        'Segmentation overlay: ${(_overlayOpacity * 100).round()}%',
-                                      ),
-                                      Slider(
-                                        value: _overlayOpacity,
-                                        min: 0,
-                                        max: 1,
-                                        divisions: 100,
-                                        label:
-                                            '${(_overlayOpacity * 100).round()}%',
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _overlayOpacity = value;
-                                          });
-                                        },
-                                      ),
-                                    ] else
-                                      Text(
-                                        _segmentationImageError ??
-                                            'No segmentation preview available.',
-                                        style: const TextStyle(
-                                          color: Colors.redAccent,
-                                        ),
-                                      ),
-                                  ],
-                                ),
+                          const SizedBox(height: 18),
+                        ],
+                        ComparisonPanel(
+                          result: _comparisonResult,
+                          error: _comparisonError,
                         ),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 12,
-                          runSpacing: 8,
-                          children: [
-                            _legendItem(
-                              color: const Color.fromARGB(255, 255, 255, 100),
-                              label: 'agriculture',
-                            ),
-                            _legendItem(
-                              color: const Color.fromARGB(255, 210, 180, 140),
-                              label: 'barren',
-                            ),
-                            _legendItem(
-                              color: const Color.fromARGB(255, 0, 100, 0),
-                              label: 'forest',
-                            ),
-                            _legendItem(
-                              color: const Color.fromARGB(255, 124, 252, 0),
-                              label: 'rangeland',
-                            ),
-                            _legendItem(
-                              color: const Color.fromARGB(255, 0, 0, 0),
-                              label: 'unknown',
-                            ),
-                            _legendItem(
-                              color: const Color.fromARGB(255, 178, 34, 34),
-                              label: 'urban',
-                            ),
-                            _legendItem(
-                              color: const Color.fromARGB(255, 65, 105, 225),
-                              label: 'water',
-                            ),
-                          ],
-                        ),
+                        if (_comparisonResult != null ||
+                            _comparisonError != null)
+                          const SizedBox(height: 18),
+                        RecommendationPanel(result: _comparisonResult),
                         const SizedBox(height: 18),
-
-                        ChartPanel(latestStats: _latestStats),
+                        // Export
+                        if (_latestStats != null) ...[
+                          _sectionTitle('Report export'),
+                          const SizedBox(height: 10),
+                          // ExportSection(onExport: _exportReport),
+                          ExportSection(
+                            onExport: _exportReport,
+                            canExport: _latestStats != null,
+                            isExporting: _isloading,
+                          ),
+                        ],
                       ],
                     ),
-
-                    const SizedBox(height: 18),
-                  ],
-                  ComparisonPanel(
-                    result: _comparisonResult,
-                    error: _comparisonError,
                   ),
-                  if (_comparisonResult != null || _comparisonError != null)
-                    const SizedBox(height: 18),
-
-                  // Export
-                  if (_latestStats != null) ...[
-                    _sectionTitle('Report export'),
-                    const SizedBox(height: 10),
-                    // ExportSection(onExport: _exportReport),
-                    ExportSection(
-                      onExport: _exportReport,
-                      canExport: _latestStats != null,
-                      isExporting: _isloading,
-                    ),
-                  ],
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           if (_isloading)

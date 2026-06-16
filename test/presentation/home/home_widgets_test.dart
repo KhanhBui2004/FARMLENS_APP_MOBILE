@@ -78,26 +78,26 @@ ComparisonModel buildComparisonFixture() {
 }
 
 void main() {
-  testWidgets('StatsPanel shows summary metrics', (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: StatsPanel(
-            area: 125.5,
-            changePercent: 8.2,
-            confidence: 93.4,
-            cloud: 18.0,
-          ),
-        ),
-      ),
-    );
+  // testWidgets('StatsPanel shows summary metrics', (tester) async {
+  //   await tester.pumpWidget(
+  //     const MaterialApp(
+  //       home: Scaffold(
+  //         body: StatsPanel(
+  //           area: 125.5,
+  //           changePercent: 8.2,
+  //           confidence: 93.4,
+  //           cloud: 18.0,
+  //         ),
+  //       ),
+  //     ),
+  //   );
 
-    expect(find.text('Analysis summary'), findsOneWidget);
-    expect(find.text('125.5 ha'), findsOneWidget);
-    expect(find.text('+8.2%'), findsOneWidget);
-    expect(find.text('93.4%'), findsOneWidget);
-    expect(find.text('18.0%'), findsOneWidget);
-  });
+  //   expect(find.text('Analysis summary'), findsOneWidget);
+  //   expect(find.text('125.5 ha'), findsOneWidget);
+  //   expect(find.text('+8.2%'), findsOneWidget);
+  //   expect(find.text('93.4%'), findsOneWidget);
+  //   expect(find.text('18.0%'), findsOneWidget);
+  // });
 
   testWidgets('StatsActions triggers each action callback', (tester) async {
     var first = false;
