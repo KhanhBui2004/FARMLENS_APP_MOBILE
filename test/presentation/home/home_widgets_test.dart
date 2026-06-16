@@ -4,7 +4,7 @@ import 'package:farmlens_app/presentation/home/widgets/actions_panel.dart';
 import 'package:farmlens_app/presentation/home/widgets/chart_panel.dart';
 import 'package:farmlens_app/presentation/home/widgets/comparison_panel.dart';
 import 'package:farmlens_app/presentation/home/widgets/export_section.dart';
-import 'package:farmlens_app/presentation/home/widgets/stats_panel.dart';
+// import 'package:farmlens_app/presentation/home/widgets/stats_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
