@@ -37,7 +37,7 @@ class ExportSection extends StatelessWidget {
               Icon(Icons.ios_share, color: Color(0xFF2E7D32)),
               SizedBox(width: 8),
               Text(
-                'Report export',
+                'Xuất báo cáo',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -49,15 +49,14 @@ class ExportSection extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             canExport
-                ? 'Export the current analysis as a PDF report for evaluation, presentation, and documentation.'
-                : 'Run segmentation analysis first to enable report export.',
+                ? 'Xuất kết quả phân tích hiện tại dưới dạng báo cáo PDF để phục vụ theo dõi, đánh giá và trình bày.'
+                : 'Vui lòng chạy phân tích phân đoạn trước khi xuất báo cáo.',
             style: TextStyle(
               color: Colors.grey.shade700,
               height: 1.4,
             ),
           ),
           const SizedBox(height: 16),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -71,7 +70,7 @@ class ExportSection extends StatelessWidget {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.picture_as_pdf),
-              label: Text(isExporting ? 'Exporting...' : 'Export PDF Report'),
+              label: Text(isExporting ? 'Đang xuất...' : 'Xuất báo cáo PDF'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2E7D32),
                 foregroundColor: Colors.white,
@@ -84,28 +83,26 @@ class ExportSection extends StatelessWidget {
               ),
             ),
           ),
-
           const SizedBox(height: 12),
-
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: null,
-                  icon: const Icon(Icons.table_view),
-                  label: const Text('Excel soon'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: null,
-                  icon: const Icon(Icons.image),
-                  label: const Text('Image soon'),
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: OutlinedButton.icon(
+          //         onPressed: null,
+          //         icon: const Icon(Icons.table_view),
+          //         label: const Text('Excel sắp có'),
+          //       ),
+          //     ),
+          //     const SizedBox(width: 10),
+          //     Expanded(
+          //       child: OutlinedButton.icon(
+          //         onPressed: null,
+          //         icon: const Icon(Icons.image),
+          //         label: const Text('Ảnh sắp có'),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );

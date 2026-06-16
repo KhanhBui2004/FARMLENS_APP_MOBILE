@@ -11,37 +11,37 @@ class ChartPanel extends StatelessWidget {
     final classes = stats.classes;
     return [
       _LandCoverSlice(
-        label: 'Agriculture',
+        label: 'Đất nông nghiệp',
         percentage: classes.agriculture?.percentage ?? 0.0,
         color: const Color(0xFFE0C35A), // vàng nông nghiệp
       ),
       _LandCoverSlice(
-        label: 'Barren',
+        label: 'Đất trống',
         percentage: classes.barren?.percentage ?? 0.0,
         color: const Color(0xFFC49A6C), // nâu đất khô
       ),
       _LandCoverSlice(
-        label: 'Forest',
+        label: 'Rừng',
         percentage: classes.forest?.percentage ?? 0.0,
         color: const Color(0xFF2E7D32), // xanh lá đậm
       ),
       _LandCoverSlice(
-        label: 'Rangeland',
+        label: 'Đồng cỏ',
         percentage: classes.rangeland?.percentage ?? 0.0,
         color: const Color(0xFF8BC34A), // xanh cỏ
       ),
       _LandCoverSlice(
-        label: 'Unknown',
+        label: 'Không xác định',
         percentage: classes.unknown?.percentage ?? 0.0,
         color: const Color(0xFF757575), // xám trung tính
       ),
       _LandCoverSlice(
-        label: 'Urban',
+        label: 'Đô thị',
         percentage: classes.urban?.percentage ?? 0.0,
         color: const Color(0xFFE53935), // đỏ đô urban
       ),
       _LandCoverSlice(
-        label: 'Water',
+        label: 'Nước',
         percentage: classes.water?.percentage ?? 0.0,
         color: const Color(0xFF1E88E5), // xanh nước
       ),
@@ -80,7 +80,7 @@ class ChartPanel extends StatelessWidget {
     );
     if (total <= 0) {
       return const Text(
-        'No land cover statistics available yet.',
+        'Chưa có thống kê lớp phủ đất.',
         style: TextStyle(color: Colors.redAccent),
       );
     }
@@ -88,7 +88,7 @@ class ChartPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Land cover distribution',
+          'Phân bố lớp phủ đất',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 10),
@@ -137,7 +137,7 @@ class ChartPanel extends StatelessWidget {
                   ),
 
                   Text(
-                    'Total area: ${((latestStats!.regionAreaM2 / 1000000.0).toStringAsFixed(2))} km²',
+                    'Tổng diện tích: ${((latestStats!.regionAreaM2 / 1000000.0).toStringAsFixed(2))} km²',
                     style: TextStyle(
                       color: Colors.grey.shade600,
                       fontSize: 12,

@@ -76,7 +76,7 @@ class StatsActions extends StatelessWidget {
       children: [
         const SizedBox(height: 10),
         const Text(
-          'Quick actions',
+          'Hành động',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 10),
@@ -92,29 +92,29 @@ class StatsActions extends StatelessWidget {
           children: [
             _featureCard(
               icon: Icons.date_range,
-              title: 'Select Time',
-              description: 'Choose the time for analysis.',
+              title: 'Thời gian phân tích',
+              description: 'chọn thời gian để phân tích.',
               color: const Color(0xFF2E7D32),
               onTap: onSelectFirstTime,
             ),
             _featureCard(
               icon: Icons.date_range,
-              title: 'Time Comparison',
-              description: 'Choose the time for comparison.',
+              title: 'Thời gian so sánh',
+              description: 'chọn thời gian để so sánh.',
               color: const Color(0xFF1565C0),
               onTap: onSelectSecondTime,
             ),
             _featureCard(
               icon: Icons.analytics,
-              title: 'Run Analysis',
-              description: 'Run the analysis on the selected data.',
+              title: 'Phân tích',
+              description: 'Phân tích lớp phủ đất.',
               color: const Color(0xFFF57C00),
               onTap: onRunAnalysis,
             ),
             _featureCard(
               icon: Icons.compare_arrows,
-              title: 'Change Detection',
-              description: 'Detect changes in the selected data.',
+              title: 'Phát hiện thay đổi',
+              description: 'Phát hiện thay đổi lớp phủ đất.',
               color: const Color(0xFF6D4C41),
               onTap: onChangeDetection,
             ),

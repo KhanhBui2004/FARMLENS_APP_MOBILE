@@ -6,7 +6,6 @@ import 'package:farmlens_app/presentation/widgets/buttonCustom_widget.dart';
 import 'package:farmlens_app/presentation/widgets/textInput_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
-  // const RegisterScreen({super.key});
   final AuthService? authService;
 
   const RegisterScreen({super.key, this.authService});
@@ -16,7 +15,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  // final authService = AuthService();
 
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
@@ -26,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
 
   bool isLoading = false;
-  String loadingMessage = 'Processing...';
+  String loadingMessage = 'Đang xử lý...';
 
   late final AuthService authService;
 
@@ -91,7 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       FocusManager.instance.primaryFocus?.unfocus();
 
-      _showLoading('Creating account...');
+      _showLoading('Đang tạo tài khoản...');
       final response = await authService.register(
         username: _usernameController.text.trim(),
         email: _emailController.text.trim(),
@@ -104,23 +102,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (response['code'] == 200) {
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Registration successful!',
+          title: 'Thành công',
+          message: 'Đăng ký thành công!',
           type: ContentType.success,
         );
         Navigator.of(context).pushReplacementNamed(AppRoutes.login);
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: response['message'] ?? 'Registration failed',
+          title: 'Lỗi',
+          message: response['message'] ?? 'Đăng ký thất bại',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -195,7 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Create Account',
+                        'Tạo Tài Khoản',
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -205,7 +203,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Create your account to continue',
+                        'Tạo tài khoản của bạn để tiếp tục',
                         style: TextStyle(
                           fontSize: 16,
                           color: colorScheme.primary,
@@ -214,13 +212,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 24),
                       TextInputWidget(
-                        hintText: 'Full name',
+                        hintText: 'Họ và tên',
                         obscureText: false,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Full name is required';
+                            return 'Họ và tên là bắt buộc';
                           }
                           return null;
                         },
@@ -234,7 +232,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         textInputAction: TextInputAction.next,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Email is required';
+                            return 'Email là bắt buộc';
                           }
                           return null;
                         },
@@ -242,13 +240,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
                       TextInputWidget(
-                        hintText: 'Username',
+                        hintText: 'Tên đăng nhập',
                         obscureText: false,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Username is required';
+                            return 'Tên đăng nhập là bắt buộc';
                           }
                           return null;
                         },
@@ -256,13 +254,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
                       TextInputWidget(
-                        hintText: 'Password',
+                        hintText: 'Mật khẩu',
                         obscureText: true,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Password is required';
+                            return 'Mật khẩu là bắt buộc';
                           }
                           return null;
                         },
@@ -270,28 +268,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
                       TextInputWidget(
-                        hintText: 'Confirm password',
+                        hintText: 'Xác nhận mật khẩu',
                         obscureText: true,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.done,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Please confirm your password';
+                            return 'Vui lòng xác nhận mật khẩu';
                           }
                           if (value != _passwordController.text) {
-                            return 'Passwords do not match';
+                            return 'Mật khẩu không khớp';
                           }
                           return null;
                         },
                         controller: _confirmPasswordController,
                       ),
                       const SizedBox(height: 24),
-                      ButtonCustomWidget(text: 'Register', onPressed: _submit),
+                      ButtonCustomWidget(text: 'Đăng ký', onPressed: _submit),
                       const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Already have an account?"),
+                          const Text("Đã có tài khoản?"),
                           const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
@@ -300,7 +298,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ).pushReplacementNamed(AppRoutes.login);
                             },
                             child: Text(
-                              'Sign in',
+                              'Đăng nhập',
                               style: TextStyle(
                                 color: colorScheme.primary,
                                 fontWeight: FontWeight.bold,

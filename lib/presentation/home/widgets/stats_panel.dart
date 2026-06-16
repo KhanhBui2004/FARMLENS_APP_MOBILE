@@ -89,14 +89,14 @@ class StatsPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Analysis summary',
+          'Tổng quan phân tích',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 10),
         Row(
           children: [
             _statCard(
-              title: 'Crop area',
+              title: 'Diện tích đất nông nghiệp',
               value: '$cropAreaKm2 km²',
               icon: Icons.square_foot,
               color: const Color(0xFF2E7D32),
@@ -104,11 +104,11 @@ class StatsPanel extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             _statCard(
-              title: 'Change vs. last period',
+              title: 'Biến động so với kỳ trước',
               value: changeText,
               icon: Icons.trending_up,
               color: change < 0 ? const Color(0xFFC62828) : const Color(0xFF1565C0),
-              caption: 'trend',
+              caption: 'xu hướng',
             ),
           ],
         ),
@@ -116,19 +116,19 @@ class StatsPanel extends StatelessWidget {
         Row(
           children: [
             _statCard(
-              title: 'Farmland share',
+              title: 'Tỷ lệ đất nông nghiệp',
               value: '${cropPercentage.toStringAsFixed(1)}%',
               icon: Icons.agriculture,
               color: const Color(0xFFF57C00),
-              caption: 'current',
+              caption: 'hiện tại',
             ),
             const SizedBox(width: 12),
             _statCard(
-              title: 'Cloud coverage',
+              title: 'Độ che phủ mây',
               value: '${cloud.toStringAsFixed(1)}%',
               icon: Icons.cloud,
               color: const Color(0xFF5E35B1),
-              caption: 'image quality',
+              caption: 'chất lượng ảnh',
             ),
           ],
         ),

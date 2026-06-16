@@ -31,7 +31,7 @@ class HistoryTabSelector extends StatelessWidget {
         children: [
           Expanded(
             child: _TabButton(
-              label: 'Segmentation list',
+              label: 'Phân đoạn',
               isActive: isSegmentationTab,
               onTap: onSegmentationTap,
             ),
@@ -39,7 +39,7 @@ class HistoryTabSelector extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(
             child: _TabButton(
-              label: 'Change detection list',
+              label: 'Phát hiện biến động',
               isActive: !isSegmentationTab,
               onTap: onChangeDetectionTap,
             ),

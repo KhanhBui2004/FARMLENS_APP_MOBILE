@@ -32,7 +32,7 @@ class HomeHeader extends StatelessWidget {
                   children: [
                     Icon(Icons.home, color: Colors.black87),
                     SizedBox(width: 12),
-                    Text('Home'),
+                    Text('Trang chủ'),
                   ],
                 ),
               ),
@@ -42,7 +42,7 @@ class HomeHeader extends StatelessWidget {
                   children: [
                     Icon(Icons.history, color: Colors.black87),
                     SizedBox(width: 12),
-                    Text('History'),
+                    Text('Lịch sử'),
                   ],
                 ),
               ),
@@ -52,7 +52,7 @@ class HomeHeader extends StatelessWidget {
                   children: [
                     Icon(Icons.person, color: Colors.black87),
                     SizedBox(width: 12),
-                    Text('Profile'),
+                    Text('Hồ sơ'),
                   ],
                 ),
               ),
@@ -62,7 +62,7 @@ class HomeHeader extends StatelessWidget {
                   children: [
                     Icon(Icons.logout, color: Colors.black87),
                     SizedBox(width: 12),
-                    Text('Logout'),
+                    Text('Đăng xuất'),
                   ],
                 ),
               ),

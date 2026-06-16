@@ -43,7 +43,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<ComparisonModel> _changeDetectionData = [];
   bool _isSegmentationTab = true;
   bool _isLoading = false;
-  String _loadingMessage = 'Processing...';
+  String _loadingMessage = 'Đang tải...';
 
   @override
   void initState() {
@@ -68,8 +68,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         Navigator.of(context).pushReplacementNamed(AppRoutes.login);
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Logged out successfully!',
+          title: 'Thành công',
+          message: 'Đăng xuất thành công!',
           type: ContentType.success,
         );
         break;
@@ -130,15 +130,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: result['message'] ?? 'Failed to fetch segmentation data',
+          title: 'Lỗi',
+          message: result['message'] ?? 'Lỗi khi tải dữ liệu phân đoạn',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -147,7 +147,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> _deleteSegmentationData() async {
     try {
-      _showLoading('Deleting segmentation data...');
+      _showLoading('Đang xóa dữ liệu phân đoạn...');
 
       final result = await _segmentationService.deleteAllSegmentation();
 
@@ -156,8 +156,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (result['code'] == 200) {
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Segmentation data deleted successfully!',
+          title: 'Thành công',
+          message: 'Xóa dữ liệu phân đoạn thành công!',
           type: ContentType.success,
         );
         setState(() {
@@ -166,15 +166,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: result['message'] ?? 'Failed to delete segmentation data',
+          title: 'Lỗi',
+          message: result['message'] ?? 'Lỗi khi xóa dữ liệu phân đoạn',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -194,8 +194,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (result['code'] == 200) {
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Segmentation data deleted successfully!',
+          title: 'Thành công',
+          message: 'Xóa dữ liệu phân đoạn thành công!',
           type: ContentType.success,
         );
         setState(() {
@@ -204,15 +204,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: result['message'] ?? 'Failed to delete segmentation data',
+          title: 'Lỗi',
+          message: result['message'] ?? 'Lỗi khi xóa dữ liệu phân đoạn',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -224,18 +224,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Delete segmentation'),
+          title: const Text('Xóa dữ liệu phân đoạn'),
           content: Text(
-            'Are you sure you want to delete Analysis ${_segmentationData.indexOf(item) + 1}?\n\nID: ${item.id}?',
+            'Bạn có chắc chắn muốn xóa dữ liệu phân đoạn ${_segmentationData.indexOf(item) + 1}?\n\nID: ${item.id}?',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: const Text('Hủy'),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Delete'),
+              child: const Text('Xóa'),
             ),
           ],
         );
@@ -253,18 +253,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Delete all history'),
+          title: const Text('Xóa toàn bộ lịch sử'),
           content: const Text(
-            'Are you sure you want to delete all segmentation history?',
+            'Bạn có chắc chắn muốn xóa toàn bộ lịch sử phân đoạn?',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: const Text('Hủy'),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Yes'),
+              child: const Text('Xóa'),
             ),
           ],
         );
@@ -289,8 +289,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: result['message'] ?? 'Failed to fetch statistics data',
+          title: 'Lỗi',
+          message: result['message'] ?? 'Lỗi khi tải dữ liệu thống kê',
           type: ContentType.failure,
         );
         return null;
@@ -298,7 +298,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -308,7 +308,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> _deleteAllStatistics() async {
     try {
-      _showLoading('Deleting statistics data...');
+      // _showLoading('Đang xóa dữ liệu thống kê...');
       final result = await _statisticsService.deleteAllStatistics();
 
       if (!mounted) return;
@@ -316,23 +316,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (result['code'] == 200) {
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'All statistics data deleted successfully!',
+          title: 'Thành công',
+          message: 'Tất cả dữ liệu thống kê đã được xóa thành công!',
           type: ContentType.success,
         );
         setState(() {});
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: result['message'] ?? 'Failed to delete statistics data',
+          title: 'Lỗi',
+          message: result['message'] ?? 'Lỗi khi xóa dữ liệu thống kê',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -350,23 +350,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (result['code'] == 200) {
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Statistics data deleted successfully!',
+          title: 'Thành công',
+          message: 'Dữ liệu thống kê đã được xóa thành công!',
           type: ContentType.success,
         );
         setState(() {});
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: result['message'] ?? 'Failed to delete statistics data',
+          title: 'Lỗi',
+          message: result['message'] ?? 'Lỗi khi xóa dữ liệu thống kê',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -387,15 +387,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: result['message'] ?? 'Failed to fetch change detection data',
+          title: 'Lỗi',
+          message: result['message'] ?? 'Lỗi khi tải dữ liệu phát hiện thay đổi',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -411,8 +411,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (result['code'] == 200) {
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Change detection data deleted successfully!',
+          title: 'Thành công',
+          message: 'Dữ liệu phát hiện thay đổi đã được xóa thành công!',
           type: ContentType.success,
         );
         setState(() {
@@ -421,16 +421,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
+          title: 'Lỗi',
           message:
-              result['message'] ?? 'Failed to delete change detection data',
+              result['message'] ?? 'Lỗi khi xóa dữ liệu phát hiện thay đổi',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -446,8 +446,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (result['code'] == 200) {
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'All change detection data deleted successfully!',
+          title: 'Thành công',
+          message: 'Tất cả dữ liệu phát hiện thay đổi đã được xóa thành công!',
           type: ContentType.success,
         );
         setState(() {
@@ -456,16 +456,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
+          title: 'Lỗi',
           message:
-              result['message'] ?? 'Failed to delete change detection data',
+              result['message'] ?? 'Lỗi khi xóa dữ liệu phát hiện thay đổi',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -477,18 +477,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Delete change detection'),
+          title: const Text('Xóa phát hiện biến động'),
           content: Text(
-            'Are you sure you want to delete Change Detection ${_changeDetectionData.indexOf(item) + 1}?\n\nID: ${item.id}?',
+            'Bạn có chắc chắn muốn xóa Phát hiện biến động ${_changeDetectionData.indexOf(item) + 1}?\n\nID: ${item.id}?',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: const Text('Hủy'),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Delete'),
+              child: const Text('Xóa'),
             ),
           ],
         );
@@ -505,18 +505,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Delete all history'),
+          title: const Text('Xóa tất cả lịch sử'),
           content: const Text(
-            'Are you sure you want to delete all change detection history?',
+            'Bạn có chắc chắn muốn xóa tất cả lịch sử phát hiện biến động?',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: const Text('Hủy'),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Yes'),
+              child: const Text('Xóa'),
             ),
           ],
         );
@@ -604,7 +604,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: HomeHeader(
                     onMenuSelected: _handleMenuAction,
-                    title: 'Farmlens History',
+                    title: 'Lịch sử FarmLens',
                     subtitle:
                         'Monitor changes in your farm over time with precision and ease.',
                   ),

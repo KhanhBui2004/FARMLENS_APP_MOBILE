@@ -1,10 +1,21 @@
 import 'dart:typed_data';
 
-import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
 import 'package:farmlens_app/data/models/analysis/comparison_model.dart';
+import 'package:farmlens_app/data/models/analysis/statistics_model.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+
+const primaryGreen = PdfColor.fromInt(0xFF2E7D32);
+const darkGreen = PdfColor.fromInt(0xFF1B5E20);
+const lightGreen = PdfColor.fromInt(0xFFE8F5E9);
+const softGray = PdfColor.fromInt(0xFFF1F3F4);
+const borderGray = PdfColor.fromInt(0xFFDADCE0);
+const textDark = PdfColor.fromInt(0xFF263238);
+const textMuted = PdfColor.fromInt(0xFF546E7A);
+const warningOrange = PdfColor.fromInt(0xFFF57C00);
+const dangerRed = PdfColor.fromInt(0xFFC62828);
 
 class ReportExportService {
   Future<Uint8List> buildPdfReport({
@@ -21,6 +32,14 @@ class ReportExportService {
   }) async {
     final pdf = pw.Document();
 
+    // Cần font Unicode để hiển thị tiếng Việt
+    final regularFont = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/Roboto-Regular.ttf'),
+    );
+    final boldFont = pw.Font.ttf(
+      await rootBundle.load('assets/fonts/Roboto-Bold.ttf'),
+    );
+
     final sentinelBytes = await _loadNetworkImageBytes(sentinelImageUrl);
     final segmentationBytes = await _loadNetworkImageBytes(
       segmentationImageUrl,
@@ -30,35 +49,71 @@ class ReportExportService {
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(24),
+        theme: pw.ThemeData.withFont(base: regularFont, bold: boldFont),
         build: (context) {
           return [
-            pw.Text(
-              'FarmLens Land Cover Analysis Report',
-              style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold),
+            pw.Container(
+              width: double.infinity,
+              padding: const pw.EdgeInsets.all(14),
+              decoration: pw.BoxDecoration(
+                color: lightGreen,
+                borderRadius: pw.BorderRadius.circular(8),
+                border: pw.Border.all(color: primaryGreen, width: 1),
+              ),
+              child: pw.Text(
+                'BÁO CÁO PHÂN TÍCH LỚP PHỦ ĐẤT - FARMLENS',
+                style: pw.TextStyle(
+                  fontSize: 20,
+                  fontWeight: pw.FontWeight.bold,
+                  color: darkGreen,
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
             ),
             pw.SizedBox(height: 12),
-            pw.Text('Analysis ID: ${segmentationId ?? '-'}'),
-            pw.Text(
-              'Location: ${lat?.toStringAsFixed(5) ?? '-'}, ${lng?.toStringAsFixed(5) ?? '-'}',
-            ),
-            pw.Text('Analysis date: ${_formatDate(analysisDate)}'),
-            pw.Text('Cloud cover: ${cloudCoverage.toStringAsFixed(1)}%'),
-            pw.Text('Area: ${calculatedArea.toStringAsFixed(2)} ha'),
-            pw.SizedBox(height: 18),
 
+            pw.Text('Mã phân tích: ${segmentationId ?? '-'}'),
             pw.Text(
-              'Satellite and Segmentation Result',
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+              'Vị trí: ${lat?.toStringAsFixed(5) ?? '-'}, ${lng?.toStringAsFixed(5) ?? '-'}',
+            ),
+            pw.Text('Ngày phân tích: ${_formatDate(analysisDate)}'),
+            pw.Text('Độ che phủ mây: ${cloudCoverage.toStringAsFixed(1)}%'),
+            pw.Text(
+              'Diện tích khu vực: ${calculatedArea.toStringAsFixed(2)} km²',
+            ),
+
+            pw.SizedBox(height: 18),
+            pw.Container(
+              width: double.infinity,
+              padding: const pw.EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 8,
+              ),
+              decoration: pw.BoxDecoration(
+                color: softGray,
+                borderRadius: pw.BorderRadius.circular(6),
+              ),
+              child: pw.Text(
+                '1. ẢNH VỆ TINH VÀ KẾT QUẢ PHÂN ĐOẠN',
+                style: pw.TextStyle(
+                  fontSize: 15,
+                  fontWeight: pw.FontWeight.bold,
+                  color: primaryGreen,
+                ),
+              ),
             ),
             pw.SizedBox(height: 8),
 
             if (sentinelBytes != null) ...[
-              pw.Text('Sentinel Image'),
+              pw.Text(
+                'Ảnh Sentinel-2',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              ),
               pw.SizedBox(height: 6),
               pw.Center(
                 child: pw.Image(
                   pw.MemoryImage(sentinelBytes),
-                  height: 280,
+                  height: 260,
                   fit: pw.BoxFit.contain,
                 ),
               ),
@@ -66,12 +121,15 @@ class ReportExportService {
             ],
 
             if (segmentationBytes != null) ...[
-              pw.Text('Segmentation Image'),
+              pw.Text(
+                'Ảnh kết quả phân đoạn',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              ),
               pw.SizedBox(height: 6),
               pw.Center(
                 child: pw.Image(
                   pw.MemoryImage(segmentationBytes),
-                  height: 280,
+                  height: 260,
                   fit: pw.BoxFit.contain,
                 ),
               ),
@@ -79,33 +137,60 @@ class ReportExportService {
             ],
 
             pw.Text(
-              'Land Cover Statistics',
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+              '2. THỐNG KÊ LỚP PHỦ ĐẤT',
+              style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 8),
             _buildStatsTable(stats),
 
             pw.SizedBox(height: 18),
             pw.Text(
-              'Automatic Interpretation',
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+              '3. NHẬN XÉT TỰ ĐỘNG',
+              style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 8),
-            pw.Text(_generateInterpretation(stats)),
+            pw.Container(
+              width: double.infinity,
+              padding: const pw.EdgeInsets.all(12),
+              decoration: pw.BoxDecoration(
+                color: PdfColor.fromInt(0xFFF8FBF8),
+                borderRadius: pw.BorderRadius.circular(8),
+                border: pw.Border.all(color: borderGray, width: 0.8),
+              ),
+              child: pw.Text(
+                _generateInterpretation(stats),
+                style: const pw.TextStyle(
+                  color: textDark,
+                  fontSize: 11,
+                  height: 1.5,
+                ),
+              ),
+            ),
 
             if (comparisonResult != null) ...[
               pw.SizedBox(height: 18),
               pw.Text(
-                'Change Detection Summary',
+                '4. SO SÁNH BIẾN ĐỘNG THEO THỜI GIAN',
                 style: pw.TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
               pw.SizedBox(height: 8),
-              pw.Text('Unit: km2'),
+              pw.Text('Đơn vị: km²'),
               pw.SizedBox(height: 8),
               _buildChangeDetectionTable(comparisonResult),
+
+              pw.SizedBox(height: 18),
+              pw.Text(
+                '5. HỖ TRỢ RA QUYẾT ĐỊNH',
+                style: pw.TextStyle(
+                  fontSize: 15,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 8),
+              _buildDecisionSupportSection(comparisonResult),
             ],
           ];
         },
@@ -119,30 +204,33 @@ class ReportExportService {
     if (url == null || url.trim().isEmpty) return null;
 
     final response = await http.get(Uri.parse(url));
-
     if (response.statusCode == 200) {
       return response.bodyBytes;
     }
-
     return null;
   }
 
   pw.Widget _buildStatsTable(StatisticsModel stats) {
     final rows = [
-      _statsRow('Agriculture', stats.classes.agriculture),
-      _statsRow('Barren', stats.classes.barren),
-      _statsRow('Forest', stats.classes.forest),
-      _statsRow('Rangeland', stats.classes.rangeland),
-      _statsRow('Urban', stats.classes.urban),
-      _statsRow('Water', stats.classes.water),
-      _statsRow('Unknown', stats.classes.unknown),
+      _statsRow('Đất nông nghiệp', stats.classes.agriculture),
+      _statsRow('Đất trống', stats.classes.barren),
+      _statsRow('Rừng', stats.classes.forest),
+      _statsRow('Đồng cỏ', stats.classes.rangeland),
+      _statsRow('Đô thị', stats.classes.urban),
+      _statsRow('Mặt nước', stats.classes.water),
+      _statsRow('Không xác định', stats.classes.unknown),
     ];
 
     return pw.Table.fromTextArray(
-      headers: ['Class', 'Percentage', 'Area'],
+      headers: ['Lớp phủ', 'Tỷ lệ', 'Diện tích'],
       data: rows,
-      headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-      headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
+      headerStyle: pw.TextStyle(
+        fontWeight: pw.FontWeight.bold,
+        color: darkGreen,
+      ),
+      cellStyle: const pw.TextStyle(color: textDark, fontSize: 10.5),
+      headerDecoration: const pw.BoxDecoration(color: lightGreen),
+      border: pw.TableBorder.all(color: borderGray, width: 0.6),
       cellAlignment: pw.Alignment.centerLeft,
       cellPadding: const pw.EdgeInsets.all(6),
     );
@@ -156,7 +244,7 @@ class ReportExportService {
     return [
       label,
       '${stats.percentage.toStringAsFixed(2)}%',
-      '${stats.area_km2.toStringAsFixed(3)} km2',
+      '${stats.area_km2.toStringAsFixed(3)} km²',
     ];
   }
 
@@ -171,37 +259,35 @@ class ReportExportService {
 
     if (agriculture >= 50) {
       buffer.writeln(
-        'Agriculture land occupies the largest proportion of the selected area, indicating that the region is mainly used for agricultural activities.',
+        'Đất nông nghiệp chiếm tỷ lệ lớn nhất trong khu vực phân tích, cho thấy khu vực có đặc trưng sản xuất nông nghiệp rõ rệt.',
       );
     }
 
     if (forest >= 15) {
       buffer.writeln(
-        'Forest land accounts for a notable proportion, which may contribute to ecological balance and environmental stability.',
+        'Diện tích rừng chiếm tỷ lệ đáng kể, góp phần duy trì cân bằng sinh thái cho khu vực.',
       );
     }
 
     if (water < 5) {
-      buffer.writeln(
-        'Water surface is relatively limited in the selected area.',
-      );
+      buffer.writeln('Diện tích mặt nước trong khu vực ở mức thấp.');
     }
 
     if (urban >= 20) {
       buffer.writeln(
-        'Urban land has a significant presence, suggesting possible residential or infrastructure development.',
+        'Đất đô thị chiếm tỷ lệ đáng kể, cho thấy khu vực có khả năng chịu tác động của hoạt động xây dựng hoặc hạ tầng.',
       );
     }
 
     if (rangeland > 0) {
       buffer.writeln(
-        'Rangeland is detected and may represent grassland or sparse vegetation areas.',
+        'Hệ thống phát hiện vùng đồng cỏ hoặc thảm thực vật thưa trong khu vực phân tích.',
       );
     }
 
     if (buffer.isEmpty) {
       buffer.writeln(
-        'The selected area contains multiple land cover types with no single class dominating strongly.',
+        'Khu vực phân tích bao gồm nhiều loại lớp phủ đất và không có lớp nào chiếm ưu thế tuyệt đối.',
       );
     }
 
@@ -224,6 +310,27 @@ class ReportExportService {
       'urban',
       'water',
     ];
+  }
+
+  String _comparisonLabel(String key) {
+    switch (key) {
+      case 'agriculture':
+        return 'Đất nông nghiệp';
+      case 'barren':
+        return 'Đất trống';
+      case 'forest':
+        return 'Rừng';
+      case 'rangeland':
+        return 'Đồng cỏ';
+      case 'unknown':
+        return 'Không xác định';
+      case 'urban':
+        return 'Đô thị';
+      case 'water':
+        return 'Mặt nước';
+      default:
+        return key;
+    }
   }
 
   double _getComparisonArea(ComparisonClasses classes, String key) {
@@ -251,7 +358,7 @@ class ReportExportService {
     final timeline = comparison.timeline;
 
     if (timeline.length < 2) {
-      return pw.Text('Not enough timeline data to compare.');
+      return pw.Text('Không đủ dữ liệu thời gian để so sánh.');
     }
 
     final first = timeline[0];
@@ -263,7 +370,7 @@ class ReportExportService {
       final delta = value2 - value1;
 
       return [
-        key,
+        _comparisonLabel(key),
         value1.toStringAsFixed(3),
         value2.toStringAsFixed(3),
         '${delta >= 0 ? '+' : ''}${delta.toStringAsFixed(3)}',
@@ -271,12 +378,84 @@ class ReportExportService {
     }).toList();
 
     return pw.Table.fromTextArray(
-      headers: ['Class', first.date, second.date, 'Change'],
+      headers: ['Lớp phủ', first.date, second.date, 'Chênh lệch'],
       data: rows,
-      headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-      headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
+      headerStyle: pw.TextStyle(
+        fontWeight: pw.FontWeight.bold,
+        color: darkGreen,
+      ),
+      cellStyle: const pw.TextStyle(color: textDark, fontSize: 10.5),
+      headerDecoration: const pw.BoxDecoration(color: lightGreen),
+      border: pw.TableBorder.all(color: borderGray, width: 0.6),
       cellAlignment: pw.Alignment.centerLeft,
       cellPadding: const pw.EdgeInsets.all(6),
+    );
+  }
+
+  pw.Widget _buildDecisionSupportSection(ComparisonModel comparison) {
+    final farmland = comparison.farmlandTracking;
+    final abnormality = comparison.abnormality;
+    final recommendation = comparison.recommendation;
+
+    final rows = <List<String>>[];
+
+    if (farmland != null) {
+      rows.add([
+        'Đất canh tác hiện tại',
+        '${farmland.currentAgricultureAreaKm2.toStringAsFixed(3)} km²',
+      ]);
+      rows.add([
+        'Biến động đất canh tác',
+        '${farmland.agricultureRelativeChangePercentage >= 0 ? '+' : ''}${farmland.agricultureRelativeChangePercentage.toStringAsFixed(2)}%',
+      ]);
+    }
+
+    if (abnormality != null) {
+      rows.add(['Trạng thái', abnormality.label]);
+      rows.add(['Đánh giá', abnormality.reason]);
+    }
+
+    if (recommendation != null) {
+      rows.add(['Khuyến nghị', recommendation.summary]);
+    }
+
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Table.fromTextArray(
+          headers: ['Nội dung', 'Giá trị'],
+          data: rows,
+          headerStyle: pw.TextStyle(
+            fontWeight: pw.FontWeight.bold,
+            color: darkGreen,
+          ),
+          cellStyle: const pw.TextStyle(color: textDark, fontSize: 10.5),
+          headerDecoration: const pw.BoxDecoration(color: lightGreen),
+          border: pw.TableBorder.all(color: borderGray, width: 0.6),
+          cellAlignment: pw.Alignment.centerLeft,
+          cellPadding: const pw.EdgeInsets.all(6),
+        ),
+        if (recommendation != null && recommendation.actions.isNotEmpty) ...[
+          pw.SizedBox(height: 10),
+          pw.Text(
+            'Hành động đề xuất:',
+            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          ),
+          pw.SizedBox(height: 6),
+          ...recommendation.actions.map(
+            (action) => pw.Padding(
+              padding: const pw.EdgeInsets.only(bottom: 4),
+              child: pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('• '),
+                  pw.Expanded(child: pw.Text(action)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

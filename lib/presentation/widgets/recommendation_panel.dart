@@ -33,7 +33,7 @@ class RecommendationPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Insights & Recommendations',
+          'Nhận định & khuyến nghị',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 10),
@@ -59,7 +59,7 @@ class RecommendationPanel extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _miniStat(
-                        'Current farmland',
+                        'Đất nông nghiệp hiện tại',
                         '${farmland.currentAgricultureAreaKm2.toStringAsFixed(2)} km²',
                         const Color(0xFF2E7D32),
                       ),
@@ -67,7 +67,7 @@ class RecommendationPanel extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _miniStat(
-                        'Change',
+                        'Biến động',
                         '${farmland.agricultureRelativeChangePercentage >= 0 ? '+' : ''}${farmland.agricultureRelativeChangePercentage.toStringAsFixed(2)}%',
                         farmland.agricultureRelativeChangePercentage < 0
                             ? const Color(0xFFC62828)
@@ -91,7 +91,7 @@ class RecommendationPanel extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    '${abnormality.label} • ${abnormality.priorityCheck ? "Field check recommended" : "Monitor periodically"}',
+                    '${abnormality.label} • ${abnormality.priorityCheck ? "Khuyến nghị kiểm tra thực địa" : "Theo dõi định kỳ"}',
                     style: TextStyle(
                       color: _statusColor(abnormality.status),
                       fontWeight: FontWeight.w700,
@@ -107,7 +107,7 @@ class RecommendationPanel extends StatelessWidget {
               ],
               if (recommendation != null) ...[
                 const Text(
-                  'Suggested action',
+                  'Gợi ý hành động',
                   style: TextStyle(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),

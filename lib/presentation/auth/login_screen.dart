@@ -6,7 +6,6 @@ import 'package:farmlens_app/presentation/widgets/textInput_widget.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class LoginScreen extends StatefulWidget {
-  // const LoginScreen({super.key});
   final AuthService? authService;
 
   const LoginScreen({super.key, this.authService});
@@ -16,14 +15,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // final authService = AuthService();
   late final AuthService authService;
   final _formKey = GlobalKey<FormState>();
   final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool isLoading = false;
-  String loadingMessage = 'Processing...';
+  String loadingMessage = 'Đang xử lý...';
 
   @override
   void initState() {
@@ -82,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       FocusManager.instance.primaryFocus?.unfocus();
-      _showLoading('Signing in...');
+      _showLoading('Đang đăng nhập...');
 
       final result = await authService.login(
         _identifierController.text.trim(),
@@ -96,8 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Sign in successful!',
+          title: 'Thành công',
+          message: 'Đăng nhập thành công!',
           type: ContentType.success,
         );
 
@@ -107,15 +105,15 @@ class _LoginScreenState extends State<LoginScreen> {
         debugPrint('Sign in failed: ${result['message']}');
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: 'Username or password is incorrect',
+          title: 'Lỗi',
+          message: 'Tên người dùng hoặc mật khẩu không đúng',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
+        title: 'Lỗi',
         message: e.toString(),
         type: ContentType.failure,
       );
@@ -185,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 12),
                       Icon(Icons.person, size: 64, color: colorScheme.primary),
                       Text(
-                        'Login Here',
+                        'Đăng nhập',
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.bold,
@@ -194,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        'Welcome back! Please login to your account.',
+                        'Chào mừng trở lại! Vui lòng đăng nhập vào tài khoản của bạn.',
                         style: TextStyle(
                           fontSize: 16,
                           color: colorScheme.primary,
@@ -203,27 +201,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 12),
                       TextInputWidget(
-                        hintText: 'Username or Email',
+                        hintText: 'Tên đăng nhập hoặc email',
                         obscureText: false,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
                         controller: _identifierController,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Username or email is required';
+                            return 'Tên đăng nhập hoặc email là bắt buộc';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
                       TextInputWidget(
-                        hintText: 'Password',
+                        hintText: 'Mật khẩu',
                         obscureText: true,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.done,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Password is required';
+                            return 'Mật khẩu là bắt buộc';
                           }
                           return null;
                         },
@@ -237,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             // Handle forgot password logic
                           },
                           child: const Text(
-                            'Forgot Password?',
+                            'Quên mật khẩu?',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.deepOrange,
@@ -247,12 +245,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      ButtonCustomWidget(text: 'Sign in', onPressed: _submit),
+                      ButtonCustomWidget(text: 'Đăng nhập', onPressed: _submit),
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don't have an account?"),
+                          const Text("Chưa có tài khoản?"),
                           const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
@@ -261,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ).pushReplacementNamed(AppRoutes.register);
                             },
                             child: Text(
-                              'Sign up',
+                              'Đăng ký',
                               style: TextStyle(
                                 color: colorScheme.primary,
                                 fontWeight: FontWeight.bold,

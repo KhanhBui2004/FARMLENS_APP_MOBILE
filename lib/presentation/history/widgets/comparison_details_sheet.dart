@@ -33,7 +33,7 @@ class ComparisonDetailsSheet extends StatelessWidget {
                 ),
               ),
               const Text(
-                'Change detection details',
+                'Chi tiết phát hiện biến động',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -41,22 +41,67 @@ class ComparisonDetailsSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              _DetailRow('Analysis ID', item.id),
+              _DetailRow('ID', item.id),
               _DetailRow(
-                'Location',
+                'Vị trí',
                 '${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
               ),
               _DetailRow(
-                'Cloud cover',
+                'Độ che phủ mây',
                 '${item.cloudCover.toStringAsFixed(1)}%',
               ),
               _DetailRow(
-                'Dates',
+                'Ngày',
                 item.dates.isEmpty ? '-' : item.dates.join(' -> '),
               ),
               const SizedBox(height: 16),
               const Text(
-                'Change timeline',
+                'Nhận định & khuyến nghị',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1F3B2D),
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (item.farmlandTracking != null) ...[
+                _DetailRow(
+                  'Đất nông nghiệp hiện tại',
+                  '${item.farmlandTracking!.currentAgricultureAreaKm2.toStringAsFixed(2)} km²',
+                ),
+                _DetailRow(
+                  'Biến động đất nông nghiệp',
+                  '${item.farmlandTracking!.agricultureRelativeChangePercentage >= 0 ? '+' : ''}${item.farmlandTracking!.agricultureRelativeChangePercentage.toStringAsFixed(2)}%'
+                ),
+              ],
+              if (item.abnormality != null) ...[
+                _DetailRow('Trạng thái', item.abnormality!.label),
+                _DetailRow('Đánh giá', item.abnormality!.reason),
+              ],
+              if (item.recommendation != null) ...[
+                _DetailRow('Hành động đề xuất', item.recommendation!.summary),
+                const SizedBox(height: 8),
+                ...item.recommendation!.actions.map(
+                  (action) => Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('• '),
+                        Expanded(
+                          child: Text(
+                            action,
+                            style: const TextStyle(color: Color(0xFF2F4F3D)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              const Text(
+                'Dòng thời gian biến động',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -68,7 +113,7 @@ class ComparisonDetailsSheet extends StatelessWidget {
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 8),
                   child: Text(
-                    'No timeline data available.',
+                    'Không có dữ liệu dòng thời gian.',
                     style: TextStyle(color: Color(0xFF4A6B57)),
                   ),
                 )
@@ -133,7 +178,7 @@ class _TimelineCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            entry.date.isEmpty ? 'Unknown date' : entry.date,
+            entry.date.isEmpty ? 'Ngày không xác định' : entry.date,
             style: const TextStyle(
               fontWeight: FontWeight.w700,
               color: Color(0xFF1F3B2D),
@@ -141,21 +186,21 @@ class _TimelineCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Region area: ${(entry.regionAreaM2 / 1000000).toStringAsFixed(2)} km²',
+            'Diện tích khu vực: ${(entry.regionAreaM2 / 1000000).toStringAsFixed(2)} km²',
             style: const TextStyle(color: Color(0xFF4A6B57), fontSize: 12),
           ),
           Text(
-            'Image: ${entry.imageSize['width'] ?? 0} x ${entry.imageSize['height'] ?? 0}',
+            'Kích thước hình ảnh: ${entry.imageSize['width'] ?? 0} x ${entry.imageSize['height'] ?? 0}',
             style: const TextStyle(color: Color(0xFF4A6B57), fontSize: 12),
           ),
           const SizedBox(height: 8),
-          _ClassAreaRow('Agriculture', entry.classes.agriculture),
-          _ClassAreaRow('Barren', entry.classes.barren),
-          _ClassAreaRow('Forest', entry.classes.forest),
-          _ClassAreaRow('Rangeland', entry.classes.rangeland),
-          _ClassAreaRow('Urban', entry.classes.urban),
-          _ClassAreaRow('Water', entry.classes.water),
-          _ClassAreaRow('Unknown', entry.classes.unknown),
+          _ClassAreaRow('Đất nông nghiệp', entry.classes.agriculture),
+          _ClassAreaRow('Đất trống', entry.classes.barren),
+          _ClassAreaRow('Rừng', entry.classes.forest),
+          _ClassAreaRow('Đồng cỏ', entry.classes.rangeland),
+          _ClassAreaRow('Đô thị', entry.classes.urban),
+          _ClassAreaRow('Nước', entry.classes.water),
+          _ClassAreaRow('Không xác định', entry.classes.unknown),
         ],
       ),
     );

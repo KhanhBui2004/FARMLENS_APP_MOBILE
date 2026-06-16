@@ -44,7 +44,7 @@ class SegmentationDetailsSheet extends StatelessWidget {
                     ),
                   ),
                   const Text(
-                    'Segmentation details',
+                    'Chi tiết phân đoạn',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -52,18 +52,18 @@ class SegmentationDetailsSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _DetailRow('Analysis ID', item.id),
-                  _DetailRow('Segmentation Date', item.date),
+                  _DetailRow('ID', item.id),
+                  _DetailRow('Ngày phân đoạn', item.date),
                   _DetailRow(
-                    'Location',
+                    'Vị trí',
                     '${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
                   ),
                   _DetailRow(
-                    'Cloud cover',
+                    'Độ che phủ mây',
                     '${item.cloudCover.toStringAsFixed(1)}%',
                   ),
                   Text(
-                    'Sentinel image',
+                    'Hình ảnh Sentinel',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -77,14 +77,14 @@ class SegmentationDetailsSheet extends StatelessWidget {
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return const Text(
-                          'Unable to load sentinel image.',
+                          'Không thể tải hình ảnh Sentinel.',
                           style: TextStyle(color: Colors.redAccent),
                         );
                       },
                     ),
                   ),
                   Text(
-                    'Segmentation image',
+                    'Hình ảnh phân đoạn',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -98,7 +98,7 @@ class SegmentationDetailsSheet extends StatelessWidget {
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return const Text(
-                          'Unable to load segmentation image.',
+                          'Không thể tải hình ảnh phân đoạn.',
                           style: TextStyle(color: Colors.redAccent),
                         );
                       },
@@ -111,37 +111,37 @@ class SegmentationDetailsSheet extends StatelessWidget {
                     children: [
                       _legendItem(
                         color: const Color.fromARGB(255, 255, 255, 0),
-                        label: 'agriculture',
+                        label: 'Nông nghiệp',
                       ),
                       _legendItem(
                         color: const Color.fromARGB(255, 232, 184, 153),
-                        label: 'barren',
+                        label: 'Đất trống',
                       ),
                       _legendItem(
                         color: const Color.fromARGB(255, 0, 255, 0),
-                        label: 'forest',
+                        label: 'Rừng',
                       ),
                       _legendItem(
                         color: const Color.fromARGB(255, 255, 0, 255),
-                        label: 'rangeland',
+                        label: 'Đồng cỏ',
                       ),
                       _legendItem(
                         color: const Color.fromARGB(255, 0, 0, 0),
-                        label: 'unknown',
+                        label: 'Không xác định',
                       ),
                       _legendItem(
                         color: const Color.fromARGB(255, 0, 255, 255),
-                        label: 'urban',
+                        label: 'Đô thị',
                       ),
                       _legendItem(
                         color: const Color.fromARGB(255, 0, 0, 255),
-                        label: 'water',
+                        label: 'Nước',
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'Land cover statistics',
+                    'Thống kê lớp phủ đất',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -158,18 +158,18 @@ class SegmentationDetailsSheet extends StatelessWidget {
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 12),
                       child: Text(
-                        'No statistics available for this analysis.',
+                        'Không có thống kê nào khả dụng cho phân tích này.',
                         style: TextStyle(color: Color(0xFF4A6B57)),
                       ),
                     )
                   else ...[
-                    _ClassRow('Agriculture', stats.classes.agriculture),
-                    _ClassRow('Barren', stats.classes.barren),
-                    _ClassRow('Forest', stats.classes.forest),
-                    _ClassRow('Rangeland', stats.classes.rangeland),
-                    _ClassRow('Urban', stats.classes.urban),
-                    _ClassRow('Water', stats.classes.water),
-                    _ClassRow('Unknown', stats.classes.unknown),
+                    _ClassRow('Đất nông nghiệp', stats.classes.agriculture),
+                    _ClassRow('Đất trống', stats.classes.barren),
+                    _ClassRow('Rừng', stats.classes.forest),
+                    _ClassRow('Đồng cỏ', stats.classes.rangeland),
+                    _ClassRow('Đô thị', stats.classes.urban),
+                    _ClassRow('Nước', stats.classes.water),
+                    _ClassRow('Không xác định', stats.classes.unknown),
                   ],
                 ],
               ),

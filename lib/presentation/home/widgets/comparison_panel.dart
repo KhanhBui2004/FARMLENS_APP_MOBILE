@@ -9,31 +9,38 @@ class ComparisonPanel extends StatelessWidget {
 
   List<String> _classOrder() {
     return [
-      'Agriculture',
-      'Barren',
-      'Forest',
-      'Rangeland',
-      'Unknown',
-      'Urban',
-      'Water',
+      // 'Agriculture',
+      // 'Barren',
+      // 'Forest',
+      // 'Rangeland',
+      // 'Unknown',
+      // 'Urban',
+      // 'Water',
+      'Nông nghiệp',
+      'Trống',
+      'Rừng',
+      'Đồng cỏ',
+      'Không xác định',
+      'Đô thị',
+      'Nước',
     ];
   }
 
   Color _classColor(String key) {
     switch (key) {
-      case 'Agriculture':
+      case 'Nông nghiệp':
         return const Color.fromARGB(255, 255, 255, 100);
-      case 'Barren':
+      case 'Trống':
         return const Color.fromARGB(255, 210, 180, 140);
-      case 'Forest':
+      case 'Rừng':
         return const Color.fromARGB(255, 0, 100, 0);
-      case 'Rangeland':
+      case 'Đồng cỏ':
         return const Color.fromARGB(255, 124, 252, 0);
-      case 'Unknown':
+      case 'Không xác định':
         return const Color.fromARGB(255, 0, 0, 0);
-      case 'Urban':
+      case 'Đô thị':
         return const Color.fromARGB(255, 178, 34, 34);
-      case 'Water':
+      case 'Nước':
         return const Color.fromARGB(255, 65, 105, 225);
       default:
         return Colors.grey;
@@ -42,19 +49,19 @@ class ComparisonPanel extends StatelessWidget {
 
   double _getArea(ComparisonClasses classes, String key) {
     switch (key) {
-      case 'Agriculture':
+      case 'Nông nghiệp':
         return classes.agriculture?.areaKm2 ?? 0.0;
-      case 'Barren':
+      case 'Trống':
         return classes.barren?.areaKm2 ?? 0.0;
-      case 'Forest':
+      case 'Rừng':
         return classes.forest?.areaKm2 ?? 0.0;
-      case 'Rangeland':
+      case 'Đồng cỏ':
         return classes.rangeland?.areaKm2 ?? 0.0;
-      case 'Unknown':
+      case 'Không xác định':
         return classes.unknown?.areaKm2 ?? 0.0;
-      case 'Urban':
+      case 'Đô thị':
         return classes.urban?.areaKm2 ?? 0.0;
-      case 'Water':
+      case 'Nước':
         return classes.water?.areaKm2 ?? 0.0;
       default:
         return 0.0;
@@ -89,7 +96,7 @@ class ComparisonPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Land cover comparison',
+          'So sánh lớp phủ đất',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 10),
@@ -114,7 +121,7 @@ class ComparisonPanel extends StatelessWidget {
                   const Expanded(
                     flex: 2,
                     child: Text(
-                      'Class',
+                      'Lớp',
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
@@ -217,14 +224,14 @@ class ComparisonPanel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Region area: ${(first.regionAreaM2 / 1000000).toStringAsFixed(2)} km²',
+                      'Tổng diện tích: ${(first.regionAreaM2 / 1000000).toStringAsFixed(2)} km²',
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontSize: 12,
                       ),
                     ),
                     Text(
-                      'Unit: km²',
+                      'Đơn vị: km²',
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontSize: 12,
@@ -247,7 +254,7 @@ class ComparisonPanel extends StatelessWidget {
     }
     if (result == null) {
       return Text(
-        error ?? 'No timeline data available.',
+        error ?? 'Chưa có dữ liệu thời gian khả dụng.',
         style: const TextStyle(color: Colors.redAccent),
       );
     }
@@ -261,7 +268,7 @@ class ComparisonPanel extends StatelessWidget {
           _buildComparisonTable(timeline[0], timeline[1])
         else
           const Text(
-            'Not enough timeline data to compare.',
+            'Chưa đủ dữ liệu thời gian để so sánh.',
             style: TextStyle(color: Colors.redAccent),
           ),
       ],

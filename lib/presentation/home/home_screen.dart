@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
   MapType _currentMapType = MapType.normal;
   DateTime _firstDate = DateTime.now();
   DateTime _secondDate = DateTime.now();
-  String _selectedRegion = 'Selected area: Central farm block';
+  String _selectedRegion = 'Khu vực đã chọn: chưa có';
   LatLng? _selectedLatLng;
   double _calculatedArea = 125.5;
   double _cloudCoverage = 18.0;
@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _sentinelImageError;
   double _overlayOpacity = 0.5;
   bool _isloading = false;
-  String _loadingMessage = 'Processing...';
+  String _loadingMessage = 'Đang xử lý...';
 
   DateTime? _segmentationAnalysisDate;
   LatLng? _segmentationLatLng;
@@ -80,8 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.of(context).pushReplacementNamed(AppRoutes.login);
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Logged out successfully!',
+          title: 'Thành công',
+          message: 'Đăng xuất thành công!',
           type: ContentType.success,
         );
         break;
@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedLatLng = selection;
       _kGooglePlex = CameraPosition(target: selection, zoom: 12);
       _selectedRegion =
-          'Selected area: ${selection.latitude.toStringAsFixed(5)}, ${selection.longitude.toStringAsFixed(5)}';
+          'Khu vực đã chọn: ${selection.latitude.toStringAsFixed(5)}, ${selection.longitude.toStringAsFixed(5)}';
 
       _selectionMarkers = {
         Marker(
@@ -197,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _runAnalysis() async {
     if (_selectedLatLng == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a location on the map.')),
+        const SnackBar(content: Text('Vui lòng chọn một vị trí trên bản đồ.')),
       );
       return;
     }
@@ -218,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _comparisonError = null;
     });
 
-    _showLoading('Running segmentation...');
+    _showLoading('Đang phân đoạn...');
 
     try {
       final service = SegmentationService();
@@ -246,23 +246,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Segmentation completed successfully!',
+          title: 'Thành công',
+          message: 'Phân đoạn hoàn tất thành công!',
           type: ContentType.success,
         );
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: 'Analysis failed: ${result['message']}',
+          title: 'Lỗi',
+          message: 'Phân tích thất bại: ${result['message']}',
           type: ContentType.failure,
         );
       }
     } catch (e) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
-        message: 'Error during analysis: $e',
+        title: 'Lỗi',
+        message: 'Lỗi trong quá trình phân tích: $e',
         type: ContentType.failure,
       );
       debugPrint('Error during analysis: $e');
@@ -292,8 +292,8 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: 'Failed to fetch statistics: ${result['message']}',
+          title: 'Lỗi',
+          message: 'Lỗi thống kê: ${result['message']}',
           type: ContentType.failure,
         );
       }
@@ -301,8 +301,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
-        message: 'Error fetching statistics: $e',
+        title: 'Lỗi',
+        message: 'Lỗi thống kê: $e',
         type: ContentType.failure,
       );
       debugPrint('Error fetching statistics: $e');
@@ -313,8 +313,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_selectedLatLng == null) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
-        message: 'Please select a location on the map.',
+        title: 'Lỗi',
+        message: 'Vui lòng chọn một vị trí trên bản đồ.',
         type: ContentType.failure,
       );
       return;
@@ -325,8 +325,8 @@ class _HomeScreenState extends State<HomeScreen> {
         _firstDate.day == _secondDate.day) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Invalid Date Range',
-        message: 'Please select two different dates for change detection.',
+        title: 'Thời gian không hợp lệ',
+        message: 'Vui lòng chọn hai ngày khác nhau để phát hiện thay đổi.',
         type: ContentType.warning,
       );
       return;
@@ -339,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final double lat = _selectedLatLng!.latitude;
     final double lng = _selectedLatLng!.longitude;
 
-    _showLoading('Running change detection...');
+    _showLoading('Đang phát hiện biến động...');
 
     try {
       setState(() {
@@ -362,8 +362,8 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Change detection completed successfully!',
+          title: 'Thành công',
+          message: 'Phát hiện thay đổi hoàn tất thành công!',
           type: ContentType.success,
         );
       } else {
@@ -372,8 +372,8 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: 'Analysis failed: ${result['message']}',
+          title: 'Lỗi',
+          message: 'Phân tích thất bại: ${result['message']}',
           type: ContentType.failure,
         );
       }
@@ -383,8 +383,8 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
-        message: 'Error during analysis: $e',
+        title: 'Lỗi',
+        message: 'Lỗi trong quá trình phân tích: $e',
         type: ContentType.failure,
       );
       debugPrint('Error during analysis: $e');
@@ -406,7 +406,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (imageUrl == null || imageUrl.trim().isEmpty) {
       setState(() {
         _segmentationImageUrl = null;
-        _segmentationImageError = 'Segmentation image is empty.';
+        _segmentationImageError = 'Ảnh phân đoạn không khả dụng.';
       });
       return;
     }
@@ -425,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (imageUrl == null || imageUrl.trim().isEmpty) {
       setState(() {
         _sentinelImageUrl = null;
-        _sentinelImageError = 'Sentinel image is empty.';
+        _sentinelImageError = 'Ảnh sentinel không khả dụng.';
       });
       return;
     }
@@ -444,8 +444,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_latestStats == null) {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
-        message: 'Please run segmentation analysis before exporting report.',
+        title: 'Lỗi',
+        message: 'Vui lòng chạy phân tích phân đoạn trước khi xuất báo cáo.',
         type: ContentType.failure,
       );
       return;
@@ -454,15 +454,15 @@ class _HomeScreenState extends State<HomeScreen> {
     if (format.toLowerCase() != 'pdf') {
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
-        message: 'Currently only PDF export is supported.',
+        title: 'Lỗi',
+        message: 'Hiện chỉ hỗ trợ xuất báo cáo PDF.',
         type: ContentType.failure,
       );
       return;
     }
 
     try {
-      _showLoading('Generating PDF report...');
+      _showLoading('Đang tạo báo cáo PDF...');
 
       final pdfBytes = await _reportExportService.buildPdfReport(
         stats: _latestStats!,
@@ -488,8 +488,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       showAwesomeSnackBar(
         context: context,
-        title: 'Error',
-        message: 'Failed to export report: $e',
+        title: 'Lỗi',
+        message: 'Lỗi khi xuất báo cáo: $e',
         type: ContentType.failure,
       );
     } finally {
@@ -546,9 +546,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: HomeHeader(
                     onMenuSelected: _handleMenuAction,
-                    title: 'FarmLens Dashboard',
+                    title: 'Bảng điều khiển FarmLens',
                     subtitle:
-                        'Satellite monitoring, U-Net segmentation and crop analytics',
+                        'Phân tích nông nghiệp từ ảnh vệ tinh',
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -586,7 +586,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: const [
                                     Text(
-                                      'Operational overview',
+                                      'Tổng quan hoạt động',
                                       style: TextStyle(
                                         color: Colors.white70,
                                         fontSize: 13,
@@ -594,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     SizedBox(height: 8),
                                     Text(
-                                      'Satellite Farm Analytics',
+                                      'Phân tích nông nghiệp từ hình ảnh vệ tinh',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 20,
@@ -625,7 +625,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 18),
 
                         // Map panel
-                        _sectionTitle('Satellite map and analysis area'),
+                        _sectionTitle('Bản đồ vệ tinh '),
                         const SizedBox(height: 10),
                         MapPanel(
                           initialCamera: _kGooglePlex,
@@ -664,7 +664,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (_segmentationImageUrl != null ||
                             _segmentationImageError != null) ...[
-                          _sectionTitle('Segmentation preview'),
+                          _sectionTitle('Kết quả phân đoạn'),
                           const SizedBox(height: 10),
                           Column(
                             children: [
@@ -685,7 +685,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: _sentinelImageUrl == null
                                     ? Text(
                                         _sentinelImageError ??
-                                            'No sentinel preview available.',
+                                            'Không có ảnh sentinel để hiển thị.',
                                         style: const TextStyle(
                                           color: Colors.redAccent,
                                         ),
@@ -711,7 +711,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         stackTrace,
                                                       ) {
                                                         return const Text(
-                                                          'Unable to load sentinel image.',
+                                                          'Không thể tải ảnh sentinel.',
                                                           style: TextStyle(
                                                             color: Colors
                                                                 .redAccent,
@@ -746,7 +746,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           if (_segmentationImageUrl !=
                                               null) ...[
                                             Text(
-                                              'Segmentation overlay: ${(_overlayOpacity * 100).round()}%',
+                                              'Độ mờ: ${(_overlayOpacity * 100).round()}%',
                                             ),
                                             Slider(
                                               value: _overlayOpacity,
@@ -764,7 +764,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ] else
                                             Text(
                                               _segmentationImageError ??
-                                                  'No segmentation preview available.',
+                                                  'Không có ảnh phân đoạn để hiển thị.',
                                               style: const TextStyle(
                                                 color: Colors.redAccent,
                                               ),
@@ -772,6 +772,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ],
                                       ),
                               ),
+                              const SizedBox(height: 5),
                               Wrap(
                                 alignment: WrapAlignment.center,
                                 spacing: 12,
@@ -784,7 +785,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       255,
                                       100,
                                     ),
-                                    label: 'agriculture',
+                                    label: 'Đất nông nghiệp',
                                   ),
                                   _legendItem(
                                     color: const Color.fromARGB(
@@ -793,11 +794,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       180,
                                       140,
                                     ),
-                                    label: 'barren',
+                                    label: 'Đất trống',
                                   ),
                                   _legendItem(
                                     color: const Color.fromARGB(255, 0, 100, 0),
-                                    label: 'forest',
+                                    label: 'Rừng',
                                   ),
                                   _legendItem(
                                     color: const Color.fromARGB(
@@ -806,11 +807,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       252,
                                       0,
                                     ),
-                                    label: 'rangeland',
+                                    label: 'Đồng cỏ',
                                   ),
                                   _legendItem(
                                     color: const Color.fromARGB(255, 0, 0, 0),
-                                    label: 'unknown',
+                                    label: 'Không xác định',
                                   ),
                                   _legendItem(
                                     color: const Color.fromARGB(
@@ -819,7 +820,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       34,
                                       34,
                                     ),
-                                    label: 'urban',
+                                    label: 'Đô thị',
                                   ),
                                   _legendItem(
                                     color: const Color.fromARGB(
@@ -828,7 +829,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       105,
                                       225,
                                     ),
-                                    label: 'water',
+                                    label: 'Nước',
                                   ),
                                 ],
                               ),
@@ -851,7 +852,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 18),
                         // Export
                         if (_latestStats != null) ...[
-                          _sectionTitle('Report export'),
+                          _sectionTitle('Xuất báo cáo'),
                           const SizedBox(height: 10),
                           // ExportSection(onExport: _exportReport),
                           ExportSection(

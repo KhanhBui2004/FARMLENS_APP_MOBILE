@@ -70,8 +70,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Navigator.of(context).pushReplacementNamed(AppRoutes.login);
         showAwesomeSnackBar(
           context: context,
-          title: 'Success',
-          message: 'Logged out successfully!',
+          title: 'Thành công',
+          message: 'Đăng xuất thành công!',
           type: ContentType.success,
         );
         break;
@@ -121,8 +121,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (result['code'] == 200) {
           showAwesomeSnackBar(
             context: context,
-            title: 'Success',
-            message: 'Profile updated successfully!',
+            title: 'Thành công',
+            message: 'Cập nhật hồ sơ thành công!',
             type: ContentType.success,
           );
 
@@ -134,8 +134,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         } else {
           showAwesomeSnackBar(
             context: context,
-            title: 'Error',
-            message: result['message'] ?? 'Failed to update profile',
+            title: 'Lỗi',
+            message: result['message'] ?? 'Cập nhật hồ sơ thất bại.',
             type: ContentType.failure,
           );
         }
@@ -144,8 +144,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         showAwesomeSnackBar(
           context: context,
-          title: 'Error',
-          message: 'Unexpected error occurred',
+          title: 'Lỗi',
+          message: 'Đã xảy ra lỗi không mong muốn',
           type: ContentType.failure,
         );
         debugPrint('Error updating profile: $e');
@@ -217,15 +217,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: HomeHeader(
                           onMenuSelected: _handleMenuAction,
-                          title: 'FarmLens Dashboard',
+                          title: 'Hồ sơ FarmLens',
                           subtitle:
-                              'Satellite monitoring, U-Net segmentation and crop analytics',
+                              'Theo dõi vệ tinh, phân đoạn U-Net và phân tích cây trồng',
                         ),
                       ),
                       const SizedBox(height: 18),
                       Icon(Icons.person, size: 50, color: colorScheme.primary),
                       Text(
-                        'Profile Settings',
+                        'Cài đặt hồ sơ',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -235,28 +235,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       TextInputWidget(
-                        hintText: 'Full name',
+                        hintText: 'Họ và tên',
                         obscureText: false,
                         keyboardType: TextInputType.text,
                         controller: _fullNameController,
                         textInputAction: TextInputAction.next,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Full name is required';
+                            return 'Họ và tên là bắt buộc';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
                       TextInputWidget(
-                        hintText: 'Username',
+                        hintText: 'Tên đăng nhập',
                         obscureText: false,
                         keyboardType: TextInputType.text,
                         controller: _usernameController,
                         textInputAction: TextInputAction.next,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Username is required';
+                            return 'Tên đăng nhập là bắt buộc';
                           }
                           return null;
                         },
@@ -270,14 +270,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         textInputAction: TextInputAction.next,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Email is required';
+                            return 'Email là bắt buộc';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
                       TextInputWidget(
-                        hintText: 'New password',
+                        hintText: 'Mật khẩu mới',
                         obscureText: true,
                         keyboardType: TextInputType.text,
                         controller: _newPasswordController,
@@ -285,14 +285,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       TextInputWidget(
-                        hintText: 'Re-enter new password',
+                        hintText: 'Xác nhận mật khẩu mới',
                         obscureText: true,
                         keyboardType: TextInputType.text,
                         controller: _confirmPasswordController,
                         textInputAction: TextInputAction.done,
                         validator: (value) {
                           if (value != _newPasswordController.text) {
-                            return 'Passwords do not match';
+                            return 'Mật khẩu xác nhận không khớp';
                           }
                           return null;
                         },
@@ -303,7 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           FocusManager.instance.primaryFocus?.unfocus();
                           _updateProfile();
                         },
-                        text: 'Save Changes',
+                        text: 'Lưu thay đổi',
                       ),
                     ],
                   ),

@@ -49,13 +49,13 @@ class _MapFullscreenSelectorState extends State<MapFullscreenSelector> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select area'),
+        title: const Text('Chọn vị trí'),
         actions: [
           TextButton(
             onPressed: _selected == null
                 ? null
                 : () => Navigator.pop(context, _selected),
-            child: const Text('Use location'),
+            child: const Text('Sử dụng vị trí'),
           ),
         ],
       ),
@@ -65,7 +65,7 @@ class _MapFullscreenSelectorState extends State<MapFullscreenSelector> {
         myLocationEnabled: false,
         zoomControlsEnabled: true,
         mapToolbarEnabled: false,
-        // liteModeEnabled: true,
+        liteModeEnabled: true,
         onMapCreated: _onMapCreated,
         onTap: _onMapTap,
         markers: marker,
@@ -75,7 +75,7 @@ class _MapFullscreenSelectorState extends State<MapFullscreenSelector> {
           : FloatingActionButton.extended(
               onPressed: () => Navigator.pop(context, _selected),
               icon: const Icon(Icons.check),
-              label: const Text('Confirm location'),
+              label: const Text('Xác nhận vị trí'),
             ),
     );
   }

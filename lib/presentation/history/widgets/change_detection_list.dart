@@ -22,7 +22,7 @@ class ChangeDetectionList extends StatelessWidget {
       return const Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 24),
-          child: Text('No change detection history yet.'),
+          child: Text('Không có dữ liệu phát hiện biến động nào.'),
         ),
       );
     }
@@ -37,7 +37,7 @@ class ChangeDetectionList extends StatelessWidget {
                 Icon(Icons.history, color: Color(0xFF3F8E5A)),
                 SizedBox(width: 8),
                 Text(
-                  'Your History',
+                  'Lịch sử của bạn',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -49,7 +49,7 @@ class ChangeDetectionList extends StatelessWidget {
             TextButton(
               onPressed: onDeleteAll,
               child: const Text(
-                'Delete all',
+                'Xóa tất cả',
                 style: TextStyle(
                   color: Color(0xFFEF5350),
                   fontSize: 15,
@@ -68,16 +68,31 @@ class ChangeDetectionList extends StatelessWidget {
           itemBuilder: (context, index) {
             final item = items[index];
             final dateRange = item.dates.isNotEmpty
-                ? '${item.dates.first} -> ${item.dates.last}'
-                : 'No dates';
+                ? '${item.dates.first} → ${item.dates.last}'
+                : 'Không có ngày';
+
+            final farmland = item.farmlandTracking;
+            final abnormality = item.abnormality;
+
+            final currentFarmland = farmland != null
+                ? '${farmland.currentAgricultureAreaKm2.toStringAsFixed(2)} km²'
+                : '-';
+
+            final changeText = farmland != null
+                ? '${farmland.agricultureRelativeChangePercentage >= 0 ? '+' : ''}${farmland.agricultureRelativeChangePercentage.toStringAsFixed(2)}%'
+                : '-';
+
+            final statusText = abnormality?.label ?? 'Stable';
+
             return HistoryCard(
-              title: 'Change detection ${index + 1}',
-              subtitle: 'Created: ${item.createdAt}',
+              title: 'Phát hiện biến động ${index + 1}',
+              subtitle: dateRange,
               lines: [
-                'Dates: $dateRange',
-                'Cloud cover: ${item.cloudCover.toStringAsFixed(1)}%',
-                'Timeline items: ${item.timeline.length}',
-                'Location: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
+                'Đất nông nghiệp hiện tại: $currentFarmland',
+                'Thay đổi: $changeText',
+                'Trạng thái: $statusText',
+                'Che phủ mây: ${item.cloudCover.toStringAsFixed(1)}%',
+                'Vị trí: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
               ],
               onTap: () => onItemTap(item),
               onDelete: () => onDeleteItem(item),

@@ -6,9 +6,9 @@ class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   final List<Map<String, String>> _previewImages = const [
-    {'title': 'Google Maps', 'asset': 'assets/image.png'},
-    {'title': 'Land Cover Map', 'asset': 'assets/landcover.jpg'},
-    {'title': 'Segmentation Result', 'asset': 'assets/segmentation.png'},
+    {'title': 'Google Maps', 'asset': 'assets/images/image.png'},
+    {'title': 'Ảnh vệ tinh', 'asset': 'assets/images/landcover.jpg'},
+    {'title': 'Kết quả phân đoạn', 'asset': 'assets/images/segmentation.png'},
   ];
 
   @override
@@ -101,7 +101,7 @@ class WelcomeScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Text(
-                      'REMOTE SENSING AI PLATFORM',
+                      'PLATFORM PHÂN TÍCH ẢNH VỆ TINH',
                       style: TextStyle(
                         color: colorScheme.primary,
                         fontSize: 12,
@@ -114,7 +114,7 @@ class WelcomeScreen extends StatelessWidget {
                   const SizedBox(height: 18),
 
                   const Text(
-                    'Analyze land cover\nfrom satellite images',
+                    'Phân tích lớp phủ đất từ ảnh vệ tinh',
                     style: TextStyle(
                       color: Color(0xFF143D2A),
                       fontSize: 34,
@@ -126,7 +126,7 @@ class WelcomeScreen extends StatelessWidget {
                   const SizedBox(height: 14),
 
                   Text(
-                    'Detect agriculture, forest, urban, water and other land cover types using satellite imagery and AI segmentation.',
+                    'Phát hiện nông nghiệp, rừng, đô thị, nước và các loại lớp phủ đất khác bằng cách sử dụng ảnh vệ tinh và phân đoạn AI.',
                     style: TextStyle(
                       color: Colors.black.withValues(alpha: 0.62),
                       fontSize: 16,
@@ -205,16 +205,16 @@ class WelcomeScreen extends StatelessWidget {
                       Expanded(
                         child: _FeatureCard(
                           icon: Icons.map_outlined,
-                          title: 'Land Mapping',
-                          subtitle: 'Classify land cover',
+                          title: 'Ảnh vệ tinh',
+                          subtitle: 'Phân loại lớp phủ đất',
                         ),
                       ),
                       SizedBox(width: 14),
                       Expanded(
                         child: _FeatureCard(
                           icon: Icons.analytics_outlined,
-                          title: 'AI Insights',
-                          subtitle: 'View area statistics',
+                          title: 'Thống kê',
+                          subtitle: 'Xem thống kê khu vực',
                         ),
                       ),
                     ],
@@ -226,7 +226,7 @@ class WelcomeScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: ButtonCustomWidget(
-                          text: 'Login',
+                          text: 'Đăng nhập',
                           onPressed: () =>
                               Navigator.of(context).pushNamed(AppRoutes.login),
                         ),
@@ -260,7 +260,7 @@ class WelcomeScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 17),
                           ),
                           child: const Text(
-                            'Create account',
+                            'Đăng ký',
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,

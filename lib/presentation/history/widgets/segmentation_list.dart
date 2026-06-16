@@ -22,7 +22,7 @@ class SegmentationList extends StatelessWidget {
       return const Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 24),
-          child: Text('No segmentation history yet.'),
+          child: Text('Không có dữ liệu phân đoạn nào.'),
         ),
       );
     }
@@ -37,7 +37,7 @@ class SegmentationList extends StatelessWidget {
                 Icon(Icons.history, color: Color(0xFF3F8E5A)),
                 SizedBox(width: 8),
                 Text(
-                  'Your History',
+                  'Lịch sử của bạn',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -49,7 +49,7 @@ class SegmentationList extends StatelessWidget {
             TextButton(
               onPressed: onDeleteAll,
               child: const Text(
-                'Delete all',
+                'Xóa tất cả',
                 style: TextStyle(
                   color: Color(0xFFEF5350),
                   fontSize: 15,
@@ -68,12 +68,12 @@ class SegmentationList extends StatelessWidget {
           itemBuilder: (context, index) {
             final item = items[index];
             return HistoryCard(
-              title: 'Analysis ${index + 1}',
-              subtitle: 'Date: ${item.date}',
+              title: 'Phân tích ${index + 1}',
+              subtitle: 'Ngày: ${item.date}',
               lines: [
-                'Cloud cover: ${item.cloudCover.toStringAsFixed(1)}%',
-                'Area: ${(item.regionAreaM2 / 1000000).toStringAsFixed(2)} km²',
-                'Location: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
+                'Che phủ mây: ${item.cloudCover.toStringAsFixed(1)}%',
+                'Diện tích: ${(item.regionAreaM2 / 1000000).toStringAsFixed(2)} km²',
+                'Vị trí: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
               ],
               onTap: () => onItemTap(item),
               onDelete: () => onDeleteItem(item),
