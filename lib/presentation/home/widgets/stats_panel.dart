@@ -77,7 +77,7 @@ class StatsPanel extends StatelessWidget {
     if (stats == null) return const SizedBox.shrink();
 
     final agri = stats!.classes.agriculture;
-    final cropAreaHa = ((agri?.area_km2 ?? 0) * 100).toStringAsFixed(1);
+    final cropAreaKm2 = (agri?.area_km2 ?? 0).toStringAsFixed(2);
 
     final change = comparison?.farmlandTracking?.agricultureRelativeChangePercentage ?? 0.0;
     final changeText =
@@ -97,7 +97,7 @@ class StatsPanel extends StatelessWidget {
           children: [
             _statCard(
               title: 'Crop area',
-              value: '$cropAreaHa ha',
+              value: '$cropAreaKm2 km²',
               icon: Icons.square_foot,
               color: const Color(0xFF2E7D32),
               caption: '${cropPercentage.toStringAsFixed(1)}%',

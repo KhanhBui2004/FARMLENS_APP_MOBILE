@@ -174,19 +174,22 @@ class FarmlandTrackingModel {
 }
 
 class AbnormalityModel {
-  final String level;
+  final String status;
+  final String label;
   final bool priorityCheck;
   final String reason;
 
   AbnormalityModel({
-    required this.level,
+    required this.status,
+    required this.label,
     required this.priorityCheck,
     required this.reason,
   });
 
   factory AbnormalityModel.fromJson(Map<String, dynamic> json) {
     return AbnormalityModel(
-      level: json['level']?.toString() ?? 'low',
+      status: json['status']?.toString() ?? 'stable',
+      label: json['label']?.toString() ?? 'Stable',
       priorityCheck: json['priority_check'] == true,
       reason: json['reason']?.toString() ?? '',
     );

@@ -6,25 +6,14 @@ class RecommendationPanel extends StatelessWidget {
 
   const RecommendationPanel({super.key, required this.result});
 
-  Color _levelColor(String level) {
-    switch (level.toLowerCase()) {
-      case 'high':
+  Color _statusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'field_check':
         return const Color(0xFFC62828);
-      case 'medium':
+      case 'monitor':
         return const Color(0xFFF57C00);
       default:
         return const Color(0xFF2E7D32);
-    }
-  }
-
-  String _levelLabel(String level) {
-    switch (level.toLowerCase()) {
-      case 'high':
-        return 'High abnormality';
-      case 'medium':
-        return 'Medium abnormality';
-      default:
-        return 'Low abnormality';
     }
   }
 
@@ -44,7 +33,7 @@ class RecommendationPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Decision support',
+          'Insights & Recommendations',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 10),
@@ -91,15 +80,20 @@ class RecommendationPanel extends StatelessWidget {
               ],
               if (abnormality != null) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: _levelColor(abnormality.level).withValues(alpha: 0.12),
+                    color: _statusColor(
+                      abnormality.status,
+                    ).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    '${_levelLabel(abnormality.level)} • ${abnormality.priorityCheck ? "Field check recommended" : "Monitor periodically"}',
+                    '${abnormality.label} • ${abnormality.priorityCheck ? "Field check recommended" : "Monitor periodically"}',
                     style: TextStyle(
-                      color: _levelColor(abnormality.level),
+                      color: _statusColor(abnormality.status),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -107,10 +101,7 @@ class RecommendationPanel extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   abnormality.reason,
-                  style: TextStyle(
-                    color: Colors.grey.shade800,
-                    height: 1.4,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade800, height: 1.4),
                 ),
                 const SizedBox(height: 14),
               ],
@@ -122,10 +113,7 @@ class RecommendationPanel extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   recommendation.summary,
-                  style: TextStyle(
-                    color: Colors.grey.shade800,
-                    height: 1.4,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade800, height: 1.4),
                 ),
                 if (recommendation.actions.isNotEmpty) ...[
                   const SizedBox(height: 10),
@@ -160,7 +148,10 @@ class RecommendationPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+          ),
           const SizedBox(height: 6),
           Text(
             value,
