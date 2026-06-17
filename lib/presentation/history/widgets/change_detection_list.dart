@@ -84,14 +84,22 @@ class ChangeDetectionList extends StatelessWidget {
 
             final statusText = abnormality?.label ?? 'Stable';
 
+            final firstSecondaryInsight =
+                (item.recommendation != null &&
+                    item.recommendation!.secondaryInsights.isNotEmpty)
+                ? item.recommendation!.secondaryInsights.first
+                : null;
+
             return HistoryCard(
               title: 'Phát hiện biến động ${index + 1}',
               subtitle: dateRange,
               lines: [
                 'Đất nông nghiệp hiện tại: $currentFarmland',
-                'Thay đổi: $changeText',
+                'Biến động: $changeText',
                 'Trạng thái: $statusText',
-                'Che phủ mây: ${item.cloudCover.toStringAsFixed(1)}%',
+                if (firstSecondaryInsight != null)
+                  'Nhận định: $firstSecondaryInsight',
+                'Độ che phủ mây: ${item.cloudCover.toStringAsFixed(1)}%',
                 'Vị trí: ${item.lat.toStringAsFixed(4)}, ${item.lng.toStringAsFixed(4)}',
               ],
               onTap: () => onItemTap(item),

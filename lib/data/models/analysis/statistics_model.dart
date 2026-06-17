@@ -8,6 +8,7 @@ class StatisticsModel {
   final int unmatchedPixels;
   final double pixelAreaM2;
   final double regionAreaM2;
+  final CurrentAreaAssessmentModel? currentAreaAssessment;
 
   StatisticsModel({
     required this.id,
@@ -19,6 +20,7 @@ class StatisticsModel {
     required this.unmatchedPixels,
     required this.pixelAreaM2,
     required this.regionAreaM2,
+    required this.currentAreaAssessment,
   });
 
   factory StatisticsModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class StatisticsModel {
       unmatchedPixels: (json['unmatched_pixels'] as num?)?.toInt() ?? 0,
       pixelAreaM2: (json['pixel_area_m2'] as num?)?.toDouble() ?? 0.0,
       regionAreaM2: (json['region_area_m2'] as num?)?.toDouble() ?? 0.0,
+      currentAreaAssessment: CurrentAreaAssessmentModel.fromJsonOrNull(json['current_area_assessment']),
     );
   }
 }
@@ -107,6 +110,44 @@ class ClassStatsModel {
   static ClassStatsModel? fromJsonOrNull(dynamic value) {
     if (value is Map<String, dynamic> && value.isNotEmpty) {
       return ClassStatsModel.fromJson(value);
+    }
+    return null;
+  }
+}
+
+class CurrentAreaAssessmentModel {
+  final String suitability;
+  final String priority;
+  final String summary;
+  final List<String> insights;
+  final Map<String, double> classPercentages;
+
+  CurrentAreaAssessmentModel({
+    required this.suitability,
+    required this.priority,
+    required this.summary,
+    required this.insights,
+    required this.classPercentages,
+  });
+
+  factory CurrentAreaAssessmentModel.fromJson(Map<String, dynamic> json) {
+    final rawPercentages =
+        (json['class_percentages'] as Map?)?.cast<String, dynamic>() ?? {};
+
+    return CurrentAreaAssessmentModel(
+      suitability: json['suitability']?.toString() ?? '',
+      priority: json['priority']?.toString() ?? '',
+      summary: json['summary']?.toString() ?? '',
+      insights: (json['insights'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      classPercentages: rawPercentages.map(
+        (key, value) => MapEntry(key, (value as num).toDouble()),
+      ),
+    );
+  }
+
+  static CurrentAreaAssessmentModel? fromJsonOrNull(dynamic value) {
+    if (value is Map<String, dynamic> && value.isNotEmpty) {
+      return CurrentAreaAssessmentModel.fromJson(value);
     }
     return null;
   }

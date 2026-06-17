@@ -9,6 +9,7 @@ import 'package:farmlens_app/presentation/home/widgets/chart_panel.dart';
 import 'package:farmlens_app/presentation/home/widgets/comparison_panel.dart';
 import 'package:farmlens_app/data/services/export/report_export_service.dart';
 import 'package:farmlens_app/presentation/home/widgets/stats_panel.dart';
+import 'package:farmlens_app/presentation/widgets/current_area_assessment_panel.dart';
 import 'package:farmlens_app/utils/router/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -547,8 +548,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: HomeHeader(
                     onMenuSelected: _handleMenuAction,
                     title: 'Bảng điều khiển FarmLens',
-                    subtitle:
-                        'Phân tích nông nghiệp từ ảnh vệ tinh',
+                    subtitle: 'Phân tích nông nghiệp từ ảnh vệ tinh',
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -652,6 +652,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           onChangeDetection: _runDetection,
                         ),
                         const SizedBox(height: 18),
+
+                        if (_latestStats?.currentAreaAssessment != null) ...[
+                          CurrentAreaAssessmentPanel(
+                            assessment: _latestStats!.currentAreaAssessment,
+                          ),
+                          const SizedBox(height: 18),
+                        ],
 
                         if (_latestStats != null) ...[
                           StatsPanel(

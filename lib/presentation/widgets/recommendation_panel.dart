@@ -130,6 +130,34 @@ class RecommendationPanel extends StatelessWidget {
                     ),
                   ),
                 ],
+                if (recommendation.secondaryInsights.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Nhận định bổ sung',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 8),
+                  ...recommendation.secondaryInsights.map(
+                    (item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('• '),
+                          Expanded(
+                            child: Text(
+                              item,
+                              style: TextStyle(
+                                color: Colors.grey.shade800,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ],
           ),

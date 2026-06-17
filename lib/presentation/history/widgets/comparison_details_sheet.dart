@@ -71,7 +71,7 @@ class ComparisonDetailsSheet extends StatelessWidget {
                 ),
                 _DetailRow(
                   'Biến động đất nông nghiệp',
-                  '${item.farmlandTracking!.agricultureRelativeChangePercentage >= 0 ? '+' : ''}${item.farmlandTracking!.agricultureRelativeChangePercentage.toStringAsFixed(2)}%'
+                  '${item.farmlandTracking!.agricultureRelativeChangePercentage >= 0 ? '+' : ''}${item.farmlandTracking!.agricultureRelativeChangePercentage.toStringAsFixed(2)}%',
                 ),
               ],
               if (item.abnormality != null) ...[
@@ -91,6 +91,36 @@ class ComparisonDetailsSheet extends StatelessWidget {
                         Expanded(
                           child: Text(
                             action,
+                            style: const TextStyle(color: Color(0xFF2F4F3D)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              if (item.recommendation != null &&
+                  item.recommendation!.secondaryInsights.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const Text(
+                  'Nhận định bổ sung',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1F3B2D),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...item.recommendation!.secondaryInsights.map(
+                  (insight) => Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('• '),
+                        Expanded(
+                          child: Text(
+                            insight,
                             style: const TextStyle(color: Color(0xFF2F4F3D)),
                           ),
                         ),

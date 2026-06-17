@@ -33,14 +33,20 @@ class ComparisonModel {
       createdAt: json['created_at']?.toString() ?? '',
       timeline:
           (json['timeline'] as List?)
-              ?.map((item) => ComparisonTimelineItem.fromJson(item as Map<String, dynamic>))
+              ?.map(
+                (item) => ComparisonTimelineItem.fromJson(
+                  item as Map<String, dynamic>,
+                ),
+              )
               .toList() ??
           [],
       farmlandTracking: FarmlandTrackingModel.fromJsonOrNull(
         json['farmland_tracking'],
       ),
       abnormality: AbnormalityModel.fromJsonOrNull(json['abnormality']),
-      recommendation: RecommendationModel.fromJsonOrNull(json['recommendation']),
+      recommendation: RecommendationModel.fromJsonOrNull(
+        json['recommendation'],
+      ),
     );
   }
 }
@@ -159,9 +165,12 @@ class FarmlandTrackingModel {
       agricultureChangeKm2:
           (json['agriculture_change_km2'] as num?)?.toDouble() ?? 0.0,
       agricultureChangePercentagePoints:
-          (json['agriculture_change_percentage_points'] as num?)?.toDouble() ?? 0.0,
+          (json['agriculture_change_percentage_points'] as num?)?.toDouble() ??
+          0.0,
       agricultureRelativeChangePercentage:
-          (json['agriculture_relative_change_percentage'] as num?)?.toDouble() ?? 0.0,
+          (json['agriculture_relative_change_percentage'] as num?)
+              ?.toDouble() ??
+          0.0,
     );
   }
 
@@ -207,18 +216,26 @@ class RecommendationModel {
   final String status;
   final String summary;
   final List<String> actions;
+  final List<String> secondaryInsights;
 
   RecommendationModel({
     required this.status,
     required this.summary,
     required this.actions,
+    required this.secondaryInsights,
   });
 
   factory RecommendationModel.fromJson(Map<String, dynamic> json) {
     return RecommendationModel(
       status: json['status']?.toString() ?? 'stable',
       summary: json['summary']?.toString() ?? '',
-      actions: (json['actions'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      actions:
+          (json['actions'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      secondaryInsights:
+          (json['secondary_insights'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 
