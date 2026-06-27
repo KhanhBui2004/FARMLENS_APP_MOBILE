@@ -34,6 +34,12 @@ StatisticsModel buildStatisticsFixture() {
     unmatchedPixels: 0,
     pixelAreaM2: 2.5,
     regionAreaM2: 6000.0,
+    currentAreaAssessment: null,
+    surveyRegion: null,
+    centerXRatio: null,
+    centerYRatio: null,
+    markerXRatio: null,
+    markerYRatio: null,
   );
 }
 

@@ -79,11 +79,14 @@ class StatsPanel extends StatelessWidget {
     final agri = stats!.classes.agriculture;
     final cropAreaKm2 = (agri?.area_km2 ?? 0).toStringAsFixed(2);
 
-    final change = comparison?.farmlandTracking?.agricultureRelativeChangePercentage ?? 0.0;
-    final changeText =
-        '${change >= 0 ? '+' : ''}${change.toStringAsFixed(1)}%';
+    final change =
+        comparison?.farmlandTracking?.agricultureRelativeChangePercentage ??
+        0.0;
+    final changeText = '${change >= 0 ? '+' : ''}${change.toStringAsFixed(1)}%';
 
     final cropPercentage = agri?.percentage ?? 0.0;
+
+    final survey = stats!.surveyRegion;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +110,9 @@ class StatsPanel extends StatelessWidget {
               title: 'Biến động so với kỳ trước',
               value: changeText,
               icon: Icons.trending_up,
-              color: change < 0 ? const Color(0xFFC62828) : const Color(0xFF1565C0),
+              color: change < 0
+                  ? const Color(0xFFC62828)
+                  : const Color(0xFF1565C0),
               caption: 'xu hướng',
             ),
           ],
@@ -132,6 +137,80 @@ class StatsPanel extends StatelessWidget {
             ),
           ],
         ),
+        if (survey != null && survey.available) ...[
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x14000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2E7D32).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.place, color: Color(0xFF2E7D32)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Khu vực ưu tiên khảo sát',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Diện tích đất nông nghiệp lớn nhất: ${survey.areaKm2.toStringAsFixed(3)} km²',
+                        style: TextStyle(
+                          color: Colors.grey.shade800,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Chiếm ${survey.percentageOfAgriculture.toStringAsFixed(1)}% tổng diện tích đất nông nghiệp.',
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 13,
+                        ),
+                      ),
+                      if (survey.centerLat != null &&
+                          survey.centerLng != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Tâm khảo sát: ${survey.centerLat!.toStringAsFixed(5)}, ${survey.centerLng!.toStringAsFixed(5)}',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }

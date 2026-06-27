@@ -65,7 +65,7 @@ class _MapFullscreenSelectorState extends State<MapFullscreenSelector> {
         myLocationEnabled: false,
         zoomControlsEnabled: true,
         mapToolbarEnabled: false,
-        liteModeEnabled: true,
+        // liteModeEnabled: true,
         onMapCreated: _onMapCreated,
         onTap: _onMapTap,
         markers: marker,

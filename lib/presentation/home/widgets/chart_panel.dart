@@ -7,6 +7,14 @@ class ChartPanel extends StatelessWidget {
 
   const ChartPanel({super.key, required this.latestStats});
 
+  // String _formatKm2(double value) {
+  //   return '${value.toStringAsFixed(2)} km²';
+  // }
+
+  // String _formatPercent(double value) {
+  //   return '${value.toStringAsFixed(1)}%';
+  // }
+
   List<_LandCoverSlice> _buildLandCoverSlices(StatisticsModel stats) {
     final classes = stats.classes;
     return [
@@ -47,6 +55,42 @@ class ChartPanel extends StatelessWidget {
       ),
     ];
   }
+
+  // List<Map<String, dynamic>> _getLandCoverItems(StatisticsModel stats) {
+  //   final classes = stats.classes;
+  //   return [
+  //     {
+  //       'name': 'Đất nông nghiệp',
+  //       'area': classes.agriculture?.area_km2 ?? 0.0,
+  //       'percentage': classes.agriculture?.percentage ?? 0.0,
+  //     },
+  //     {
+  //       'name': 'Đất trống',
+  //       'area': classes.barren?.area_km2 ?? 0.0,
+  //       'percentage': classes.barren?.percentage ?? 0.0,
+  //     },
+  //     {
+  //       'name': 'Rừng',
+  //       'area': classes.forest?.area_km2 ?? 0.0,
+  //       'percentage': classes.forest?.percentage ?? 0.0,
+  //     },
+  //     {
+  //       'name': 'Đồng cỏ/cây bụi',
+  //       'area': classes.rangeland?.area_km2 ?? 0.0,
+  //       'percentage': classes.rangeland?.percentage ?? 0.0,
+  //     },
+  //     {
+  //       'name': 'Đất đô thị',
+  //       'area': classes.urban?.area_km2 ?? 0.0,
+  //       'percentage': classes.urban?.percentage ?? 0.0,
+  //     },
+  //     {
+  //       'name': 'Mặt nước',
+  //       'area': classes.water?.area_km2 ?? 0.0,
+  //       'percentage': classes.water?.percentage ?? 0.0,
+  //     },
+  //   ];
+  // }
 
   Widget _legendItem({required Color color, required String label}) {
     return Row(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:farmlens_app/data/models/analysis/comparison_model.dart';
@@ -705,47 +706,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                             borderRadius: BorderRadius.circular(
                                               16,
                                             ),
-                                            child: Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                Image.network(
-                                                  _sentinelImageUrl!,
-                                                  fit: BoxFit.contain,
-                                                  errorBuilder:
-                                                      (
-                                                        context,
-                                                        error,
-                                                        stackTrace,
-                                                      ) {
-                                                        return const Text(
-                                                          'Không thể tải ảnh sentinel.',
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .redAccent,
-                                                          ),
-                                                        );
-                                                      },
-                                                ),
-
-                                                if (_segmentationImageUrl !=
-                                                    null)
-                                                  Opacity(
-                                                    opacity: _overlayOpacity,
-                                                    child: Image.network(
-                                                      _segmentationImageUrl!,
-                                                      fit: BoxFit.contain,
-                                                      errorBuilder:
-                                                          (
-                                                            context,
-                                                            error,
-                                                            stackTrace,
-                                                          ) {
-                                                            return const SizedBox.shrink();
-                                                          },
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
+                                            child:
+                                                _buildSegmentationOverlayImage(),
                                           ),
 
                                           const SizedBox(height: 12),
@@ -929,6 +891,156 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(color: Colors.grey.shade800, fontSize: 12),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildSegmentationOverlayImage() {
+  final survey = _latestStats?.surveyRegion;
+
+  final imageWidth = _latestStats?.imageSize.width.toDouble() ?? 1024.0;
+  final imageHeight = _latestStats?.imageSize.height.toDouble() ?? 1024.0;
+
+  final aspectRatio = imageWidth / imageHeight;
+
+  return AspectRatio(
+    aspectRatio: aspectRatio,
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = constraints.maxHeight;
+
+        final markerXRatio = survey?.markerXRatio ?? survey?.centerXRatio;
+        final markerYRatio = survey?.markerYRatio ?? survey?.centerYRatio;
+
+        final hasSurveyMarker = survey != null &&
+            survey.available &&
+            markerXRatio != null &&
+            markerYRatio != null;
+
+        final markerX = hasSurveyMarker ? markerXRatio * width : 0.0;
+        final markerY = hasSurveyMarker ? markerYRatio * height : 0.0;
+
+        final labelLeft = hasSurveyMarker
+            ? math.max(8.0, math.min(width - 100.0, markerX - 50.0))
+            : 0.0;
+
+        final labelTop = hasSurveyMarker
+            ? math.max(8.0, markerY - 38.0)
+            : 0.0;
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: Image.network(
+                _sentinelImageUrl!,
+                fit: BoxFit.fill,
+              ),
+            ),
+
+            if (_segmentationImageUrl != null)
+              Positioned.fill(
+                child: Opacity(
+                  opacity: _overlayOpacity,
+                  child: Image.network(
+                    _segmentationImageUrl!,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ),
+
+            if (hasSurveyMarker) ...[
+              Positioned(
+                left: labelLeft,
+                top: labelTop,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x33000000),
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    '${survey.areaKm2.toStringAsFixed(2)} km²',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1B5E20),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Điểm chính xác nằm trong cụm agriculture lớn nhất
+              Positioned(
+                left: markerX - 7,
+                top: markerY - 7,
+                child: Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1B5E20),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 3,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x66000000),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    ),
+  );
+}
+
+  Widget _surveyMarker({required double areaKm2}) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Text(
+            '${areaKm2.toStringAsFixed(2)} km²',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF1B5E20),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        const Icon(Icons.location_on, color: Color(0xFF1B5E20), size: 38),
       ],
     );
   }

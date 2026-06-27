@@ -39,6 +39,12 @@ StatisticsModel buildStatsFixture() {
     unmatchedPixels: 0,
     pixelAreaM2: 2.5,
     regionAreaM2: 6000.0,
+    currentAreaAssessment: null,
+    surveyRegion: null,
+    centerXRatio: null,
+    centerYRatio: null,
+    markerXRatio: null,
+    markerYRatio: null,
   );
 }
 
@@ -78,27 +84,6 @@ ComparisonModel buildComparisonFixture() {
 }
 
 void main() {
-  // testWidgets('StatsPanel shows summary metrics', (tester) async {
-  //   await tester.pumpWidget(
-  //     const MaterialApp(
-  //       home: Scaffold(
-  //         body: StatsPanel(
-  //           area: 125.5,
-  //           changePercent: 8.2,
-  //           confidence: 93.4,
-  //           cloud: 18.0,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-
-  //   expect(find.text('Analysis summary'), findsOneWidget);
-  //   expect(find.text('125.5 ha'), findsOneWidget);
-  //   expect(find.text('+8.2%'), findsOneWidget);
-  //   expect(find.text('93.4%'), findsOneWidget);
-  //   expect(find.text('18.0%'), findsOneWidget);
-  // });
-
   testWidgets('StatsActions triggers each action callback', (tester) async {
     var first = false;
     var second = false;
@@ -224,6 +209,12 @@ void main() {
       unmatchedPixels: 0,
       pixelAreaM2: 0,
       regionAreaM2: 0,
+      currentAreaAssessment: null,
+      surveyRegion: null,
+      centerXRatio: null,
+      centerYRatio: null,
+      markerXRatio: null,
+      markerYRatio: null,
     );
 
     await tester.pumpWidget(
