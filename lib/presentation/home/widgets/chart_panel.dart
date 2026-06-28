@@ -7,13 +7,13 @@ class ChartPanel extends StatelessWidget {
 
   const ChartPanel({super.key, required this.latestStats});
 
-  // String _formatKm2(double value) {
-  //   return '${value.toStringAsFixed(2)} km²';
-  // }
+  String _formatKm2(double value) {
+    return '${value.toStringAsFixed(2)} km²';
+  }
 
-  // String _formatPercent(double value) {
-  //   return '${value.toStringAsFixed(1)}%';
-  // }
+  String _formatPercent(double value) {
+    return '${value.toStringAsFixed(1)}%';
+  }
 
   List<_LandCoverSlice> _buildLandCoverSlices(StatisticsModel stats) {
     final classes = stats.classes;
@@ -56,41 +56,206 @@ class ChartPanel extends StatelessWidget {
     ];
   }
 
-  // List<Map<String, dynamic>> _getLandCoverItems(StatisticsModel stats) {
-  //   final classes = stats.classes;
-  //   return [
-  //     {
-  //       'name': 'Đất nông nghiệp',
-  //       'area': classes.agriculture?.area_km2 ?? 0.0,
-  //       'percentage': classes.agriculture?.percentage ?? 0.0,
-  //     },
-  //     {
-  //       'name': 'Đất trống',
-  //       'area': classes.barren?.area_km2 ?? 0.0,
-  //       'percentage': classes.barren?.percentage ?? 0.0,
-  //     },
-  //     {
-  //       'name': 'Rừng',
-  //       'area': classes.forest?.area_km2 ?? 0.0,
-  //       'percentage': classes.forest?.percentage ?? 0.0,
-  //     },
-  //     {
-  //       'name': 'Đồng cỏ/cây bụi',
-  //       'area': classes.rangeland?.area_km2 ?? 0.0,
-  //       'percentage': classes.rangeland?.percentage ?? 0.0,
-  //     },
-  //     {
-  //       'name': 'Đất đô thị',
-  //       'area': classes.urban?.area_km2 ?? 0.0,
-  //       'percentage': classes.urban?.percentage ?? 0.0,
-  //     },
-  //     {
-  //       'name': 'Mặt nước',
-  //       'area': classes.water?.area_km2 ?? 0.0,
-  //       'percentage': classes.water?.percentage ?? 0.0,
-  //     },
-  //   ];
-  // }
+  List<Map<String, dynamic>> _getLandCoverItems(StatisticsModel stats) {
+    final classes = stats.classes;
+    return [
+      {
+        'name': 'Đất nông nghiệp',
+        'area': classes.agriculture?.area_km2 ?? 0.0,
+        'percentage': classes.agriculture?.percentage ?? 0.0,
+      },
+      {
+        'name': 'Đất trống',
+        'area': classes.barren?.area_km2 ?? 0.0,
+        'percentage': classes.barren?.percentage ?? 0.0,
+      },
+      {
+        'name': 'Rừng',
+        'area': classes.forest?.area_km2 ?? 0.0,
+        'percentage': classes.forest?.percentage ?? 0.0,
+      },
+      {
+        'name': 'Đồng cỏ/cây bụi',
+        'area': classes.rangeland?.area_km2 ?? 0.0,
+        'percentage': classes.rangeland?.percentage ?? 0.0,
+      },
+      {
+        'name': 'Đất đô thị',
+        'area': classes.urban?.area_km2 ?? 0.0,
+        'percentage': classes.urban?.percentage ?? 0.0,
+      },
+      {
+        'name': 'Mặt nước',
+        'area': classes.water?.area_km2 ?? 0.0,
+        'percentage': classes.water?.percentage ?? 0.0,
+      },
+    ];
+  }
+
+  Widget _buildLandCoverInsight(StatisticsModel stats) {
+  final items = _getLandCoverItems(stats)
+      .where((item) => (item['area'] as double) > 0)
+      .toList();
+
+  items.sort(
+    (a, b) => (b['area'] as double).compareTo(a['area'] as double),
+  );
+
+  final dominant = items.isNotEmpty ? items.first : null;
+  final agriculture = stats.classes.agriculture;
+  final survey = stats.surveyRegion;
+
+  final totalAreaKm2 = stats.regionAreaM2 / 1000000.0;
+
+  String agricultureAssessment;
+
+  if (agriculture!.percentage >= 50) {
+    agricultureAssessment =
+        'Khu vực có tỷ lệ đất nông nghiệp cao, phù hợp để ưu tiên theo dõi sản xuất nông nghiệp và khảo sát thực địa.';
+  } else if (agriculture.percentage >= 25) {
+    agricultureAssessment =
+        'Khu vực có đất nông nghiệp ở mức trung bình, cần xem xét thêm sự phân bố với các lớp phủ khác trước khi khảo sát.';
+  } else {
+    agricultureAssessment =
+        'Tỷ lệ đất nông nghiệp trong khu vực không cao, việc khảo sát nên tập trung vào các cụm đất nông nghiệp lớn thay vì toàn bộ khu vực.';
+  }
+
+  return Container(
+    width: double.infinity,
+    margin: const EdgeInsets.only(top: 16),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x14000000),
+          blurRadius: 18,
+          offset: Offset(0, 8),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Thông tin phân tích lớp phủ đất',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        Text(
+          'Tổng diện tích khu vực phân tích: ${_formatKm2(totalAreaKm2)}.',
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade800,
+          ),
+        ),
+
+        if (dominant != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            '${dominant['name']} là lớp phủ chiếm diện tích lớn nhất với '
+            '${_formatKm2(dominant['area'])}, tương ứng '
+            '${_formatPercent(dominant['percentage'])} khu vực phân tích.',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey.shade800,
+            ),
+          ),
+        ],
+
+        const SizedBox(height: 6),
+
+        Text(
+          'Đất nông nghiệp chiếm ${_formatKm2(agriculture.area_km2)}, tương ứng '
+          '${_formatPercent(agriculture.percentage)}.',
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade800,
+          ),
+        ),
+
+        const SizedBox(height: 6),
+
+        Text(
+          agricultureAssessment,
+          style: const TextStyle(
+            fontSize: 13,
+            color: Color(0xFF2E7D32),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+
+        if (survey != null && survey.available) ...[
+          const SizedBox(height: 8),
+          Text(
+            'Cụm đất nông nghiệp lớn nhất có diện tích '
+            '${_formatKm2(survey.areaKm2)}, chiếm '
+            '${_formatPercent(survey.percentageOfAgriculture)} tổng diện tích đất nông nghiệp. '
+            'Đây là khu vực nên được ưu tiên khảo sát.',
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0xFF1B5E20),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+
+        const SizedBox(height: 14),
+
+        const Text(
+          'Chi tiết từng lớp phủ',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        ...items.map((item) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    item['name'],
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+                Text(
+                  _formatKm2(item['area']),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                  width: 56,
+                  child: Text(
+                    _formatPercent(item['percentage']),
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    ),
+  );
+}
 
   Widget _legendItem({required Color color, required String label}) {
     return Row(
@@ -179,7 +344,7 @@ class ChartPanel extends StatelessWidget {
                         )
                         .toList(),
                   ),
-
+                  
                   Text(
                     'Tổng diện tích: ${((latestStats!.regionAreaM2 / 1000000.0).toStringAsFixed(2))} km²',
                     style: TextStyle(
@@ -193,6 +358,7 @@ class ChartPanel extends StatelessWidget {
             ],
           ),
         ),
+        _buildLandCoverInsight(latestStats!),
       ],
     );
   }

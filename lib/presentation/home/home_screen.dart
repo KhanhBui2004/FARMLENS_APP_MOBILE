@@ -131,6 +131,55 @@ class _HomeScreenState extends State<HomeScreen> {
       ..showSnackBar(snackBar);
   }
 
+  void _openSegmentationImagePreview() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Đóng',
+      barrierColor: Colors.black.withValues(alpha: 0.9),
+      transitionDuration: const Duration(milliseconds: 180),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return SafeArea(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Stack(
+              children: [
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: InteractiveViewer(
+                      minScale: 1,
+                      maxScale: 5,
+                      panEnabled: true,
+                      scaleEnabled: true,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: _buildSegmentationOverlayImage(),
+                      ),
+                    ),
+                  ),
+                ),
+
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _selectRegion() async {
     final LatLng? selection = await Navigator.of(context).push(
       MaterialPageRoute(
@@ -654,13 +703,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 18),
 
-                        if (_latestStats?.currentAreaAssessment != null) ...[
-                          CurrentAreaAssessmentPanel(
-                            assessment: _latestStats!.currentAreaAssessment,
-                          ),
-                          const SizedBox(height: 18),
-                        ],
-
+                        // if (_latestStats?.currentAreaAssessment != null) ...[
+                        //   CurrentAreaAssessmentPanel(
+                        //     assessment: _latestStats!.currentAreaAssessment,
+                        //   ),
+                        //   const SizedBox(height: 18),
+                        // ],
                         if (_latestStats != null) ...[
                           StatsPanel(
                             stats: _latestStats,
@@ -702,12 +750,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              16,
+                                          // ClipRRect(
+                                          //   borderRadius: BorderRadius.circular(
+                                          //     16,
+                                          //   ),
+                                          //   child:
+                                          //       _buildSegmentationOverlayImage(),
+                                          // ),
+                                          GestureDetector(
+                                            onTap:
+                                                _openSegmentationImagePreview,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              child:
+                                                  _buildSegmentationOverlayImage(),
                                             ),
-                                            child:
-                                                _buildSegmentationOverlayImage(),
                                           ),
 
                                           const SizedBox(height: 12),
@@ -896,122 +954,117 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildSegmentationOverlayImage() {
-  final survey = _latestStats?.surveyRegion;
+    final survey = _latestStats?.surveyRegion;
 
-  final imageWidth = _latestStats?.imageSize.width.toDouble() ?? 1024.0;
-  final imageHeight = _latestStats?.imageSize.height.toDouble() ?? 1024.0;
+    final imageWidth = _latestStats?.imageSize.width.toDouble() ?? 1024.0;
+    final imageHeight = _latestStats?.imageSize.height.toDouble() ?? 1024.0;
 
-  final aspectRatio = imageWidth / imageHeight;
+    final aspectRatio = imageWidth / imageHeight;
 
-  return AspectRatio(
-    aspectRatio: aspectRatio,
-    child: LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final height = constraints.maxHeight;
+    return AspectRatio(
+      aspectRatio: aspectRatio,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final height = constraints.maxHeight;
 
-        final markerXRatio = survey?.markerXRatio ?? survey?.centerXRatio;
-        final markerYRatio = survey?.markerYRatio ?? survey?.centerYRatio;
+          final markerXRatio = survey?.markerXRatio ?? survey?.centerXRatio;
+          final markerYRatio = survey?.markerYRatio ?? survey?.centerYRatio;
 
-        final hasSurveyMarker = survey != null &&
-            survey.available &&
-            markerXRatio != null &&
-            markerYRatio != null;
+          final hasSurveyMarker =
+              survey != null &&
+              survey.available &&
+              markerXRatio != null &&
+              markerYRatio != null;
 
-        final markerX = hasSurveyMarker ? markerXRatio * width : 0.0;
-        final markerY = hasSurveyMarker ? markerYRatio * height : 0.0;
+          final markerX = hasSurveyMarker ? markerXRatio * width : 0.0;
+          final markerY = hasSurveyMarker ? markerYRatio * height : 0.0;
 
-        final labelLeft = hasSurveyMarker
-            ? math.max(8.0, math.min(width - 100.0, markerX - 50.0))
-            : 0.0;
+          final labelLeft = hasSurveyMarker
+              ? math.max(8.0, math.min(width - 100.0, markerX - 50.0))
+              : 0.0;
 
-        final labelTop = hasSurveyMarker
-            ? math.max(8.0, markerY - 38.0)
-            : 0.0;
+          final labelTop = hasSurveyMarker
+              ? math.max(8.0, markerY - 38.0)
+              : 0.0;
 
-        return Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Positioned.fill(
-              child: Image.network(
-                _sentinelImageUrl!,
-                fit: BoxFit.fill,
-              ),
-            ),
-
-            if (_segmentationImageUrl != null)
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
               Positioned.fill(
-                child: Opacity(
-                  opacity: _overlayOpacity,
-                  child: Image.network(
-                    _segmentationImageUrl!,
-                    fit: BoxFit.fill,
-                  ),
-                ),
+                child: Image.network(_sentinelImageUrl!, fit: BoxFit.fill),
               ),
 
-            if (hasSurveyMarker) ...[
-              Positioned(
-                left: labelLeft,
-                top: labelTop,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x33000000),
-                        blurRadius: 8,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    '${survey.areaKm2.toStringAsFixed(2)} km²',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1B5E20),
+              if (_segmentationImageUrl != null)
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: _overlayOpacity,
+                    child: Image.network(
+                      _segmentationImageUrl!,
+                      fit: BoxFit.fill,
                     ),
                   ),
                 ),
-              ),
 
-              // Điểm chính xác nằm trong cụm agriculture lớn nhất
-              Positioned(
-                left: markerX - 7,
-                top: markerY - 7,
-                child: Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1B5E20),
-                    shape: BoxShape.circle,
-                    border: Border.all(
+              if (hasSurveyMarker) ...[
+                Positioned(
+                  left: labelLeft,
+                  top: labelTop,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
                       color: Colors.white,
-                      width: 3,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x33000000),
+                          blurRadius: 8,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
                     ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x66000000),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
+                    child: Text(
+                      '${survey.areaKm2.toStringAsFixed(2)} km²',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF1B5E20),
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+
+                // Điểm chính xác nằm trong cụm agriculture lớn nhất
+                Positioned(
+                  left: markerX - 7,
+                  top: markerY - 7,
+                  child: Container(
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1B5E20),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x66000000),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
-        );
-      },
-    ),
-  );
-}
+          );
+        },
+      ),
+    );
+  }
 
   Widget _surveyMarker({required double areaKm2}) {
     return Column(
